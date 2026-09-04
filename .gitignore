@@ -2,6 +2,7 @@
 # Исходники сборки и выгруженные из игры таблицы остаются локальными.
 *
 !.gitignore
+!.gitattributes
 !README.md
 !docs/
 !docs/**
