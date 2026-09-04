@@ -42,7 +42,7 @@ main { padding: 0 32px; max-width: 1680px; margin: 0 auto; }
 /* --- шапки ------------------------------------------------------------ */
 
 .site-logo { padding: 34px 32px 0; text-align: center; }
-.site-logo img { max-width: 260px; max-height: 220px; width: auto; }
+.site-logo img { display: block; margin: 0 auto; max-width: 180px; max-height: 155px; width: auto; }
 
 .site-head { padding: 26px 32px 22px; text-align: center; }
 .site-banner { display: block; margin: 0 auto; width: 291px; max-width: 100%; }
