@@ -231,3 +231,46 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 /* Тир или редкость поменялись: старое зачёркнуто, новое ниже. */
 .stack { display: inline-flex; flex-direction: column; line-height: 16px; }
 .stack s { color: var(--gone); }
+
+/* --- обычный режим против режима сравнения ---------------------------- */
+
+/* По умолчанию страница показывает только то, что есть в моде: одна колонка
+   свойств, без разниц в скобках, без зачёркнутого и без «новых» цветов. Всё
+   это лежит в разметке всегда — галочка лишь снимает класс simple. */
+
+.compare {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--dim);
+  cursor: pointer;
+  user-select: none;
+}
+.compare input { accent-color: var(--link); cursor: pointer; }
+.compare:hover { color: var(--text); }
+
+/* Ванильная колонка. */
+.simple .c-props.van { display: none; }
+.simple .c-props.mod { width: auto; }
+.simple th.c-props.mod .src { display: none; }
+
+/* Предметы, которых в моде нет, и статы, которые мод убрал. */
+.simple tr.gone-row { display: none; }
+.simple ul.props li.gone { display: none; }
+
+/* Разница в скобках. */
+.simple ul.props .delta { display: none; }
+
+/* «Новое» и «стало лучше/хуже» — обычными цветами стата. */
+.simple ul.props .new-good { color: var(--good); }
+.simple ul.props .new-bad { color: var(--bad); }
+
+/* Тир и редкость: старое значение не показывается, новое встаёт в строку. */
+.simple .stack s { display: none; }
+.simple .stack { display: inline; }
+.simple .stack .new-good { color: var(--text); }
+
+/* Пустые места нужны только для построчного соответствия двух колонок. */
+.simple ul.props li.empty { display: none; }
