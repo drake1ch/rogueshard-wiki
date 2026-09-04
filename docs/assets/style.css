@@ -277,8 +277,13 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 /* Без второй колонки таблице незачем растягиваться на всю ширину: она сжимается
    по содержимому, а не тянет одну колонку свойств через весь экран. На узком
    экране ограничение по ширине родителя оставляет обычную прокрутку. */
-.simple .table-wrap { width: fit-content; max-width: 100%; }
+.simple .table-wrap {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
 .simple table { width: auto; }
-.simple .c-item { width: auto; }
-.simple .c-props.mod { width: auto; min-width: 300px; }
-.simple ul.props { min-width: 260px; }
+/* Ширины колонок остаются теми же, что и в режиме сравнения: сжимается только
+   таблица целиком, а внутри неё отступы и колонка предмета не меняются. */
+.simple .c-props.mod { width: auto; min-width: 440px; }
