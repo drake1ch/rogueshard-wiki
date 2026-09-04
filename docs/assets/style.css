@@ -1,0 +1,228 @@
+/* Rogue Shard Wiki — оформление.
+   Тёмная схема под стать игре; цвета статов повторяют внутриигровые подсказки. */
+
+:root {
+  --bg: #0e1022;
+  --panel: #171a33;
+  --panel-2: #1d2140;
+  --panel-3: #232848;
+  --line: #2b3057;
+  --text: #d7dbf0;
+  --dim: #8b91b4;
+  --link: #7fa9ff;
+
+  --good: #74c274;          /* обычный полезный стат */
+  --bad: #d06a6a;           /* обычный вредный стат */
+  --new-good: #a8ff4d;      /* новое хорошее / стало лучше */
+  --new-bad: #ff3d3d;       /* новое плохое / стало хуже */
+  --gone: #6a6f8c;          /* убрано модом */
+  --unique: #a15cd8;        /* редкость Unique, как в игре */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 0 64px;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 "Segoe UI", Roboto, system-ui, sans-serif;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Пиксель-арт: только ближайший сосед, иначе иконки мылятся при увеличении. */
+img { image-rendering: pixelated; }
+
+main { padding: 0 32px; max-width: 1680px; margin: 0 auto; }
+
+/* --- шапки ------------------------------------------------------------ */
+
+.site-head { padding: 40px 32px 22px; text-align: center; }
+.site-banner { display: block; margin: 0 auto; width: 291px; max-width: 100%; }
+.site-head h1 {
+  margin: 18px 0 0;
+  font-size: 26px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.crumbs {
+  padding: 20px 32px 0;
+  font-size: 13px;
+  color: var(--dim);
+  max-width: 1680px;
+  margin: 0 auto;
+}
+.crumbs i { font-style: normal; margin: 0 8px; color: var(--line); }
+
+.page-head { padding: 10px 32px 4px; max-width: 1680px; margin: 0 auto; }
+.page-head h1 { margin: 4px 0 0; font-size: 26px; }
+.page-head .count { color: var(--dim); font-size: 15px; font-weight: 400; }
+.page-head .group-label { color: var(--dim); font-size: 17px; font-weight: 400; margin-left: 8px; }
+
+/* --- плитки категорий ------------------------------------------------- */
+
+/* Группы стоят рядом и переносятся целиком: ширина каждой пропорциональна
+   числу категорий в ней, поэтому «Ranged» из трёх встаёт справа от широкой
+   «One-Handed», а не под ней. */
+.groups { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+
+.tile-group {
+  flex-grow: var(--cols, 3);
+  flex-shrink: 1;
+  flex-basis: calc(var(--cols, 3) * 150px);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--panel);
+}
+.tile-group h2 {
+  margin: 0;
+  padding: 9px 12px;
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--panel-3);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+/* Плитки внутри группы стоят вплотную, деля общие границы. */
+.tiles { display: grid; grid-template-columns: repeat(var(--cols, 3), 1fr); }
+.tiles .tile + .tile { border-left: 1px solid var(--line); }
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  color: var(--link);
+  transition: background .12s;
+}
+.tile:hover { background: var(--panel-2); text-decoration: none; }
+.tile:hover .tile-name { background: #2f376b; }
+
+.tile-name {
+  padding: 9px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Спрайты в игре крошечные (27x81, 54x54 и подобные), поэтому картинке
+   задаётся размер коробки, а не потолок: max-width умеет только уменьшать,
+   и иконки оставались в натуральную величину. */
+.tile-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 176px;
+  padding: 16px;
+}
+.tile-art img { width: 100%; height: 100%; object-fit: contain; }
+.tile-art .noicon { width: 56px; height: 56px; }
+
+.tile-sub {
+  padding: 7px 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--dim);
+  border-top: 1px solid var(--line);
+}
+
+/* --- таблица предметов ------------------------------------------------ */
+
+/* Широкая таблица прокручивается внутри себя, страница — никогда. */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-top: 16px;
+}
+table { border-collapse: collapse; width: 100%; background: var(--panel); }
+th, td { padding: 10px 12px; vertical-align: top; border-bottom: 1px solid var(--line); }
+tbody tr:last-child td { border-bottom: 0; }
+th {
+  background: var(--panel-3);
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--dim);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+tbody tr:hover { background: #1b1f3d; }
+
+/* Полоса-заголовок билда внутри категории. */
+tbody tr.build td {
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+tbody tr.build:hover { background: transparent; }
+.src { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--dim); }
+.src.mod { color: var(--new-good); }
+
+.c-item { width: 320px; }
+.c-tier { width: 64px; white-space: nowrap; }
+.c-props { width: 38%; }
+
+.c-item .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 112px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.c-item .icon img { width: 100%; height: 100%; object-fit: contain; }
+.noicon {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+}
+.names { display: inline-block; vertical-align: middle; }
+.names .en { display: block; font-size: 15px; font-weight: 600; }
+.names .ru { display: block; color: var(--dim); font-size: 12px; }
+.gone-row .names .en { color: var(--gone); text-decoration: line-through; }
+
+/* Обе колонки свойств идут построчно парами, поэтому пустые места сохраняются:
+   строка слева и строка справа — это один и тот же стат. */
+ul.props { list-style: none; margin: 0; padding: 0; font-size: 13px; max-width: 440px; }
+ul.props li { display: flex; gap: 10px; line-height: 21px; min-height: 21px; }
+ul.props li.empty { min-height: 21px; }
+
+/* Урон и защита отделяются от бонусов, прочность с ценой — от них же.
+   Классы вешаются по номеру строки, поэтому в обеих колонках отступ встаёт на
+   одну и ту же строку и построчное соответствие не ломается. */
+ul.props li.gap-below { margin-bottom: 10px; }
+ul.props li.gap-above { margin-top: 10px; }
+ul.props .label { color: var(--dim); flex: 1 1 auto; }
+ul.props .value { color: var(--text); }
+ul.props .good { color: var(--good); }
+ul.props .bad { color: var(--bad); }
+ul.props .new-good { color: var(--new-good); }
+ul.props .new-bad { color: var(--new-bad); }
+ul.props .neutral { color: var(--dim); }
+ul.props .rarity-unique, .stack .rarity-unique { color: var(--unique); font-weight: 600; }
+ul.props .delta { font-size: 12px; }
+ul.props li.gone, ul.props .gone { color: var(--gone); }
+ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through; }
+
+/* Тир или редкость поменялись: старое зачёркнуто, новое ниже. */
+.stack { display: inline-flex; flex-direction: column; line-height: 16px; }
+.stack s { color: var(--gone); }
