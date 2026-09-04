@@ -253,7 +253,6 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 
 /* Ванильная колонка. */
 .simple .c-props.van { display: none; }
-.simple .c-props.mod { width: auto; }
 .simple th.c-props.mod .src { display: none; }
 
 /* Предметы, которых в моде нет, и статы, которые мод убрал. */
@@ -274,3 +273,12 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 
 /* Пустые места нужны только для построчного соответствия двух колонок. */
 .simple ul.props li.empty { display: none; }
+
+/* Без второй колонки таблице незачем растягиваться на всю ширину: она сжимается
+   по содержимому, а не тянет одну колонку свойств через весь экран. На узком
+   экране ограничение по ширине родителя оставляет обычную прокрутку. */
+.simple .table-wrap { width: fit-content; max-width: 100%; }
+.simple table { width: auto; }
+.simple .c-item { width: auto; }
+.simple .c-props.mod { width: auto; min-width: 300px; }
+.simple ul.props { min-width: 260px; }
