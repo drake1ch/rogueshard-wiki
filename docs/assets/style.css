@@ -32,14 +32,19 @@ body {
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* Пиксель-арт: только ближайший сосед, иначе иконки мылятся при увеличении. */
-img { image-rendering: pixelated; }
+/* Пиксель-арт: только ближайший сосед, иначе иконки мылятся при увеличении.
+   Логотипа и шапок это не касается — они не пиксельные и их уменьшают, а
+   ближайший сосед на уменьшении рвёт линии. */
+.tile-art img, .c-item img { image-rendering: pixelated; }
 
 main { padding: 0 32px; max-width: 1680px; margin: 0 auto; }
 
 /* --- шапки ------------------------------------------------------------ */
 
-.site-head { padding: 40px 32px 22px; text-align: center; }
+.site-logo { padding: 34px 32px 0; text-align: center; }
+.site-logo img { max-width: 260px; max-height: 220px; width: auto; }
+
+.site-head { padding: 26px 32px 22px; text-align: center; }
 .site-banner { display: block; margin: 0 auto; width: 291px; max-width: 100%; }
 .site-head h1 {
   margin: 18px 0 0;
