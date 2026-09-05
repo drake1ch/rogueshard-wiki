@@ -31,6 +31,13 @@ const TROPHIES = {
 // Выживания. Отдельной галочки у них нет — работают как обычные.
 const DIRWIN_BRANCH = 'survival';
 
+// Потолок атрибута. Игра говорит об этом прямо в описании: «Макс. значение
+// силы — 30 ед.»
+const ATTR_CAP = 30;
+
+// Потолок уровня — тоже 30.
+const LEVEL_CAP = 30;
+
 let DATA = null;
 let S = null;
 
@@ -169,8 +176,28 @@ function blockedBy(node) {
 
 /* --- действия ----------------------------------------------------------- */
 
+// Откат снимками, а не обратными операциями: состояние маленькое, а обратная
+// операция для каждого действия — отдельный источник ошибок (снятый навык
+// тянет за собой очки, бонусы Дирвина и строки лога).
+const HISTORY = [];
+const TRACKED = ['level', 'learned', 'attrSpent', 'trophy', 'log'];
+
+function snapshot() {
+  const keep = {};
+  for (const k of TRACKED) keep[k] = S[k];
+  HISTORY.push(JSON.stringify(keep));
+  if (HISTORY.length > 300) HISTORY.shift();
+}
+
+function undo() {
+  if (!HISTORY.length) return;
+  Object.assign(S, JSON.parse(HISTORY.pop()));
+  render();
+}
+
 function learn(node, branch) {
   if (blockedBy(node)) return;
+  snapshot();
   const id = ++logId;
   S.learned.push({ obj: node.obj, branch: branch.key, level: S.level, pool: '', logId: id });
   logLine(`${node.name.en}`, '', id);
@@ -189,6 +216,7 @@ function unlearn(obj) {
     return found && (found.node.needs || []).some((g) => g.includes(obj));
   });
   if (dependents.length) return;
+  snapshot();
   // Строка лога снимается вместе с навыком, а не дописывается новой.
   const gone = S.learned.find((l) => l.obj === obj);
   S.learned = S.learned.filter((l) => l.obj !== obj);
@@ -197,7 +225,8 @@ function unlearn(obj) {
 }
 
 function spendAttr(attr) {
-  if (left('attr') <= 0) return;
+  if (left('attr') <= 0 || attrValue(attr) >= ATTR_CAP) return;
+  snapshot();
   const pool = activePool();
   S.attrSpent.push({ attr, level: S.level, pool });
   logLine(`${ATTR_NAME[attr]} → ${attrValue(attr)}`, pool);
@@ -207,6 +236,8 @@ function spendAttr(attr) {
 function levelUp() {
   // Отдельной строки про сам уровень в логе нет: номер уровня и так стоит
   // слева у каждой записи о трате.
+  if (S.level >= LEVEL_CAP) return;
+  snapshot();
   S.level += 1;
   render();
 }
@@ -254,7 +285,8 @@ function renderHero() {
       el('span', { class: 'a-value' }, attrValue(a)),
       el('span', { class: 'a-gain' }, gain ? `+${gain}` : ''),
       el('button', {
-        disabled: left('attr') <= 0 || null,
+        disabled: (left('attr') <= 0 || attrValue(a) >= ATTR_CAP) || null,
+        title: attrValue(a) >= ATTR_CAP ? `Capped at ${ATTR_CAP}` : null,
         onclick: () => spendAttr(a),
       }, '+'));
   }));
@@ -266,10 +298,21 @@ function renderHero() {
       el('input', {
         type: 'checkbox',
         checked: S.trophy === t.key || null,
-        onchange: (e) => { S.trophy = e.target.checked ? t.key : null; render(); },
+        onchange: (e) => {
+          snapshot();
+          S.trophy = e.target.checked ? t.key : null;
+          render();
+        },
       }),
       el('span', {}, `${t.label} (${t.attr - used} of ${t.attr} left)`));
   }));
+
+  const undoBtn = document.getElementById('undo');
+  undoBtn.disabled = HISTORY.length === 0;
+
+  const levelBtn = document.getElementById('levelUp');
+  levelBtn.disabled = S.level >= LEVEL_CAP;
+  levelBtn.title = S.level >= LEVEL_CAP ? `Level ${LEVEL_CAP} is the cap` : '';
 
   const log = document.getElementById('log');
   log.replaceChildren(...S.log.map((l) => el('li', {},
@@ -504,13 +547,23 @@ function boot() {
   S = freshState(DATA.characters[0].key);
 
   pick.addEventListener('change', () => {
+    HISTORY.length = 0;
     const open = S.open;
     S = freshState(pick.value);
     S.open = open;
     render();
   });
   document.getElementById('levelUp').addEventListener('click', levelUp);
+  document.getElementById('undo').addEventListener('click', undo);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      undo();
+    }
+  });
   document.getElementById('reset').addEventListener('click', () => {
+    HISTORY.length = 0;
     const open = S.open;
     S = freshState(S.hero);
     S.open = open;

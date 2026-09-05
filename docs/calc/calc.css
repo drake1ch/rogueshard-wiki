@@ -120,7 +120,8 @@
   font: inherit;
 }
 .controls .primary { background: #2c3566; border-color: #3d4a8a; }
-.controls button:hover { border-color: var(--available); }
+.controls button:hover:not(:disabled) { border-color: var(--available); }
+.controls button:disabled { opacity: .4; cursor: default; }
 
 /* Лог во всю ширину под деревьями и в несколько колонок: так он не требует
    собственной прокрутки даже к тридцатому уровню. */
