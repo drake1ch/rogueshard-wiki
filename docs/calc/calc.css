@@ -11,9 +11,12 @@
   align-items: flex-start;
   gap: 20px;
   padding: 14px 24px 40px;
-  max-width: 1900px;
-  margin: 0 auto;
 }
+
+/* Общий стиль вики центрирует main и ограничивает его по ширине — калькулятору
+   это мешает: он должен занимать всё, что есть, и начинаться слева. */
+.calc .trees { max-width: none; margin: 0; padding: 0; }
+.crumbs { max-width: none; margin: 0; }
 
 /* --- панель персонажа -------------------------------------------------- */
 
@@ -171,9 +174,9 @@
   gap: 16px;
   align-items: start;
 }
-@media (max-width: 1750px) { .tree-grid { grid-template-columns: repeat(3, max-content); } }
-@media (max-width: 1330px) { .tree-grid { grid-template-columns: repeat(2, max-content); } }
-@media (max-width: 900px) { .tree-grid { grid-template-columns: max-content; } }
+@media (max-width: 2400px) { .tree-grid { grid-template-columns: repeat(3, max-content); } }
+@media (max-width: 1560px) { .tree-grid { grid-template-columns: repeat(2, max-content); } }
+@media (max-width: 1060px) { .tree-grid { grid-template-columns: max-content; } }
 
 .tree {
   background: var(--panel);
@@ -224,18 +227,18 @@
 
 .node .order {
   position: absolute;
-  right: -6px;
-  bottom: -6px;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 3px;
-  border-radius: 9px;
+  right: -8px;
+  bottom: -8px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 12px;
   background: #1a1d33;
-  border: 1px solid var(--learned);
+  border: 2px solid var(--learned);
   color: var(--learned);
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 700;
-  line-height: 15px;
+  line-height: 20px;
   text-align: center;
 }
 .node .order.bonus { border-color: var(--new-good); color: var(--new-good); }
