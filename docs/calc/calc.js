@@ -78,7 +78,9 @@ function spent(pool) {
 function activePool() { return S.trophy || ''; }
 
 function left(kind) {
-  const pool = activePool();
+  // Трофейные пулы — только про атрибуты: очки способностей всегда берутся из
+  // обычного пула, даже когда галочка трофея включена.
+  const pool = kind === 'attr' ? activePool() : '';
   const g = granted()[pool] || { skill: 0, attr: 0 };
   return g[kind] - spent(pool)[kind];
 }
@@ -112,10 +114,13 @@ function blockedBy(node) {
     }
   }
 
-  const missing = (node.needs || []).filter((o) => !isLearned(o));
-  if (missing.length) {
-    const names = missing.map((o) => (nodeOf(o) ? nodeOf(o).node.name.en : o));
-    return `Requires ${names.join(', ')}`;
+  // needs — это группы: внутри группы нужны все навыки, а групп достаточно
+  // любой (правило checkConnected из ctr_SkillConnection).
+  const groups = node.needs || [];
+  if (groups.length && !groups.some((g) => g.every(isLearned))) {
+    const name = (o) => (nodeOf(o) ? nodeOf(o).node.name.en : o);
+    const variants = groups.map((g) => g.map(name).join(' + '));
+    return `Requires ${variants.join(' or ')}`;
   }
 
   if (left('skill') <= 0) return 'No skill points left';
@@ -126,9 +131,8 @@ function blockedBy(node) {
 
 function learn(node, branch) {
   if (blockedBy(node)) return;
-  const pool = activePool();
-  S.learned.push({ obj: node.obj, branch: branch.key, level: S.level, pool });
-  logLine(`${node.name.en}`, pool);
+  S.learned.push({ obj: node.obj, branch: branch.key, level: S.level, pool: '' });
+  logLine(`${node.name.en}`, '');
   render();
 }
 
@@ -136,7 +140,7 @@ function unlearn(obj) {
   // Снять можно только навык, на котором ничего не держится.
   const dependents = S.learned.filter((l) => {
     const found = nodeOf(l.obj);
-    return found && (found.node.needs || []).includes(obj);
+    return found && (found.node.needs || []).some((g) => g.includes(obj));
   });
   if (dependents.length) return;
   S.learned = S.learned.filter((l) => l.obj !== obj);
@@ -257,7 +261,7 @@ function renderTree(key) {
   });
 
   for (const ln of b.lines) {
-    const on = (ln.needs || []).length > 0 && ln.needs.every(isLearned);
+    const on = (ln.needs || []).some((g) => g.every(isLearned));
     body.append(el('img', {
       class: `line${on ? ' on' : ''}`,
       src: `icons/${ln.sprite}.png`,
