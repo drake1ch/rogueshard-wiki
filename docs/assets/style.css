@@ -41,7 +41,17 @@ main { padding: 0 32px; max-width: 1680px; margin: 0 auto; }
 
 /* --- шапки ------------------------------------------------------------ */
 
-.site-logo { padding: 34px 32px 0; text-align: center; }
+/* Шапка: логотип по центру, кнопка калькулятора слева от него. Три колонки,
+   а не флекс с отступами, — так логотип остаётся ровно по центру страницы
+   независимо от ширины кнопки. */
+.site-logo {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 26px;
+  padding: 34px 32px 0;
+  text-align: center;
+}
 .site-logo img { display: block; margin: 0 auto; max-width: 180px; max-height: 155px; width: auto; }
 
 .site-head { padding: 26px 32px 22px; text-align: center; }
@@ -290,14 +300,41 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
    границу, тогда как в режиме сравнения справа от них остаётся запас. */
 .simple .c-props.mod { width: auto; min-width: 500px; }
 
-/* Ссылка на калькулятор под шапкой главной. */
-.top-links { text-align: center; padding: 0 32px 18px; }
-.top-links a {
+/* Кнопка калькулятора в шапке. */
+.calc-button {
+  justify-self: end;
   display: inline-block;
-  padding: 8px 18px;
-  background: var(--panel-2);
+  padding: 13px 26px;
   border: 1px solid var(--line);
-  border-radius: 4px;
-  font-weight: 600;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #232a55, #1a1f3d);
+  text-align: center;
+  transition: border-color .15s, background .15s, transform .15s;
 }
-.top-links a:hover { border-color: var(--link); text-decoration: none; }
+.calc-button:hover {
+  border-color: var(--link);
+  background: linear-gradient(180deg, #2c356b, #202750);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.calc-button-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.calc-button-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--dim);
+}
+.calc-button:hover .calc-button-title { color: var(--link); }
+
+@media (max-width: 800px) {
+  .site-logo { grid-template-columns: 1fr; }
+  .calc-button { justify-self: center; }
+}
