@@ -119,17 +119,38 @@
 .controls .primary { background: #2c3566; border-color: #3d4a8a; }
 .controls button:hover { border-color: var(--available); }
 
-.log-wrap { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
-.log-head { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+/* Лог во всю ширину под деревьями и в несколько колонок: так он не требует
+   собственной прокрутки даже к тридцатому уровню. */
+.log-wrap {
+  margin-top: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 16px 16px;
+}
+.log-head {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
 .log {
   list-style: none;
-  margin: 8px 0 0;
+  margin: 0;
   padding: 0;
-  max-height: 260px;
-  overflow-y: auto;
   font-size: 12px;
+  columns: 260px;
+  column-gap: 26px;
 }
-.log li { padding: 2px 0; color: var(--dim); }
+.log li { padding: 2px 0; color: var(--dim); break-inside: avoid; }
+.log li.head {
+  color: var(--text);
+  font-weight: 600;
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 5px;
+}
 .log .lv { color: var(--text); font-weight: 600; margin-right: 6px; }
 .log .bonus { color: var(--new-good); }
 
@@ -137,7 +158,15 @@
 
 .trees { flex: 1 1 auto; min-width: 0; }
 .tree-add { max-width: 320px; margin-bottom: 14px; }
-.tree-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+/* Ровно три ветки в ряд, пока хватает ширины. */
+.tree-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1600px) { .tree-grid { grid-template-columns: repeat(2, max-content); } }
+@media (max-width: 1100px) { .tree-grid { grid-template-columns: max-content; } }
 
 .tree {
   background: var(--panel);

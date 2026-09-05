@@ -275,7 +275,6 @@ function renderHero() {
     l.head ? null : el('span', { class: 'lv' }, l.level),
     l.text,
     l.note ? el('span', { class: 'bonus' }, ` — ${l.note}`) : null)));
-  log.scrollTop = log.scrollHeight;
 }
 
 function renderTrees() {
@@ -292,7 +291,9 @@ function renderTrees() {
 
 function renderTree(key) {
   const b = DATA.branches.find((x) => x.key === key);
-  const scale = 3;
+  // 2.5, а не 3: при тройке в ряд три панели по 187 игровых пикселей шириной
+  // должны уместиться рядом с панелью героя.
+  const scale = 2.5;
 
   // Габарит ветки, чтобы панель была ровно по содержимому.
   const xs = b.nodes.map((n) => n.x - n.geom[2]);
