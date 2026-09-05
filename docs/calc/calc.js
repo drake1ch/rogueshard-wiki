@@ -124,8 +124,10 @@ function blockedBy(node) {
   // Уровень и атрибуты — АЛЬТЕРНАТИВЫ: в o_skill_ico_Other_11 каждая проверка
   // снимает замок сама по себе. И считается не сумма атрибутов, а сумма
   // превышения над базовой десяткой: `_attributes_points += _attribute - 10`.
-  const needLevel = node.level > 1;
-  const needAttrs = node.attrValue > 0 && node.attrs.length > 0;
+  // Первый тир ветки открыт всегда: scr_skill_open_from_array снимает с него
+  // замок, и проверки уровня с атрибутами до него не доходят.
+  const needLevel = !node.tier1 && node.level > 1;
+  const needAttrs = !node.tier1 && node.attrValue > 0 && node.attrs.length > 0;
   if (needLevel || needAttrs) {
     const byLevel = needLevel && S.level >= node.level;
     const over = attrOver(node);
@@ -410,13 +412,13 @@ function showTip(e, node) {
     el('h4', {}, node.name.en),
     el('div', { class: 'kind' }, node.passive ? 'Passive' : 'Active'),
     el('hr', {}),
-    node.level > 1
+    !node.tier1 && node.level > 1
       ? el('div', { class: 'row' }, el('span', {}, 'Unlocks at level'), el('b', {}, node.level))
       : null,
-    node.level > 1 && node.attrValue > 0
+    !node.tier1 && node.level > 1 && node.attrValue > 0
       ? el('div', { class: 'row alt' }, el('span', {}, 'or'), el('b', {}, ''))
       : null,
-    node.attrValue > 0
+    !node.tier1 && node.attrValue > 0
       ? el('div', { class: 'row' },
           el('span', {}, `${node.attrs.map((a) => ATTR_ALIAS[a] || a).join(' + ')} over 10`),
           el('b', {}, `≥ ${node.attrValue} (now ${attrOver(node)})`))
