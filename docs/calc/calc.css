@@ -241,3 +241,6 @@
 
 /* Строка «или» между двумя альтернативными требованиями в подсказке. */
 .tip .row.alt { color: var(--dim); font-style: italic; padding-left: 8px; }
+
+/* Стартовый навык: выдан перком, очков не стоит, снять нельзя. */
+.node .order.start { border-color: #8fd0ff; color: #8fd0ff; }

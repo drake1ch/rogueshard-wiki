@@ -36,17 +36,32 @@ let S = null;
 
 /* --- состояние --------------------------------------------------------- */
 
+// Пул стартовых навыков: они выданы перком или всем сразу, очков не стоят и
+// снять их нельзя.
+const START = 'start';
+
 function freshState(charKey) {
   const hero = DATA.characters.find((c) => c.key === charKey) || DATA.characters[0];
+
+  const start = (hero.start || []).map((obj) => {
+    const found = nodeOf(obj);
+    return { obj, branch: found ? found.branch.key : '', level: 0, pool: START };
+  });
+
   return {
     hero: hero.key,
     level: 1,
-    learned: [],          // {obj, branch, level, pool}
+    learned: start,       // {obj, branch, level, pool}
     attrSpent: [],        // {attr, level, pool}
     trophy: null,         // активный трофей или null
     open: [],             // открытые панели веток
     formulas: false,
-    log: [],
+    log: start.map((l) => ({
+      id: 0,
+      level: '',
+      text: nodeOf(l.obj) ? nodeOf(l.obj).node.name.en : l.obj,
+      note: 'starting skill',
+    })),
   };
 }
 
@@ -161,6 +176,9 @@ function learn(node, branch) {
 let logId = 0;
 
 function unlearn(obj) {
+  const own = S.learned.find((l) => l.obj === obj);
+  if (own && own.pool === START) return;
+
   // Снять можно только навык, на котором ничего не держится.
   const dependents = S.learned.filter((l) => {
     const found = nodeOf(l.obj);
@@ -311,8 +329,8 @@ function renderTree(key) {
 
     if (got) {
       node.append(el('span', {
-        class: `order${got.pool ? ' bonus' : ''}`,
-      }, got.pool ? got.pool[0].toUpperCase() : got.level));
+        class: `order${got.pool ? ' bonus' : ''}${got.pool === START ? ' start' : ''}`,
+      }, got.pool === START ? '★' : (got.pool ? got.pool[0].toUpperCase() : got.level)));
     }
     body.append(node);
   }
