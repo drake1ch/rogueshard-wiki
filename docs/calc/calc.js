@@ -381,7 +381,9 @@ function showTip(e, node) {
   const blocked = blockedBy(node);
   const mods = (node.modifiedBy || []).map((a) => ATTR_NAME[ATTR_ALIAS[a] || a] || a.replace(/_/g, ' '));
 
-  tip.replaceChildren(
+  // replaceChildren превращает null в текстовый узел «null», поэтому пустые
+  // строки надо отсеять, а не просто вернуть null вместо элемента.
+  const rows = [
     el('h4', {}, node.name.en),
     el('div', { class: 'kind' }, node.passive ? 'Passive' : 'Active'),
     el('hr', {}),
@@ -394,9 +396,10 @@ function showTip(e, node) {
     mods.length ? el('div', { class: 'row' }, el('span', {}, 'Modified by'), el('b', {}, mods.join(', '))) : null,
     el('hr', {}),
     describe(node),
-    blocked && blocked !== 'learned'
-      ? [el('hr', {}), el('div', { class: 'req no' }, blocked)]
-      : null);
+    blocked && blocked !== 'learned' ? el('hr', {}) : null,
+    blocked && blocked !== 'learned' ? el('div', { class: 'req no' }, blocked) : null,
+  ];
+  tip.replaceChildren(...rows.flat().filter(Boolean));
 
   tip.hidden = false;
   moveTip(e);
