@@ -60,7 +60,7 @@ function freshState(charKey) {
     level: 1,
     learned: start,       // {obj, branch, level, pool}
     attrSpent: [],        // {attr, level, pool}
-    trophy: null,         // активный трофей или null
+    granted: [],          // выданные трофейные пулы, в порядке нажатия
     open: [],             // открытые панели веток
     formulas: false,
     log: start.map((l) => ({
@@ -89,8 +89,20 @@ function granted() {
     out[''].attr += n;
   }
 
-  for (const t of TROPHIES[S.hero] || []) out[t.key] = { skill: 0, attr: t.attr };
+  // Трофейный пул существует только после нажатия кнопки.
+  for (const t of TROPHIES[S.hero] || []) {
+    out[t.key] = { skill: 0, attr: S.granted.includes(t.key) ? t.attr : 0 };
+  }
   return out;
+}
+
+/** Из какого пула тратить следующее очко атрибутов: трофейные идут первыми. */
+function attrPool() {
+  const g = granted();
+  for (const key of S.granted) {
+    if ((g[key] || { attr: 0 }).attr - spent(key).attr > 0) return key;
+  }
+  return '';
 }
 
 function spent(pool) {
@@ -100,15 +112,13 @@ function spent(pool) {
   };
 }
 
-/** Пул, из которого сейчас тратим: активный трофей или обычный. */
-function activePool() { return S.trophy || ''; }
-
 function left(kind) {
-  // Трофейные пулы — только про атрибуты: очки способностей всегда берутся из
-  // обычного пула, даже когда галочка трофея включена.
-  const pool = kind === 'attr' ? activePool() : '';
-  const g = granted()[pool] || { skill: 0, attr: 0 };
-  return g[kind] - spent(pool)[kind];
+  const g = granted();
+  if (kind === 'skill') return g[''].skill - spent('').skill;
+
+  // Очки атрибутов показываются одним числом: обычные плюс невыбранные
+  // трофейные. Откуда именно уйдёт следующее — решает attrPool.
+  return Object.keys(g).reduce((t, key) => t + g[key].attr - spent(key).attr, 0);
 }
 
 function attrValue(attr) {
@@ -180,7 +190,7 @@ function blockedBy(node) {
 // операция для каждого действия — отдельный источник ошибок (снятый навык
 // тянет за собой очки, бонусы Дирвина и строки лога).
 const HISTORY = [];
-const TRACKED = ['level', 'learned', 'attrSpent', 'trophy', 'log'];
+const TRACKED = ['level', 'learned', 'attrSpent', 'granted', 'log'];
 
 function snapshot() {
   const keep = {};
@@ -227,7 +237,7 @@ function unlearn(obj) {
 function spendAttr(attr) {
   if (left('attr') <= 0 || attrValue(attr) >= ATTR_CAP) return;
   snapshot();
-  const pool = activePool();
+  const pool = attrPool();
   S.attrSpent.push({ attr, level: S.level, pool });
   logLine(`${ATTR_NAME[attr]} → ${attrValue(attr)}`, pool);
   render();
@@ -293,18 +303,18 @@ function renderHero() {
 
   const box = document.getElementById('trophies');
   box.replaceChildren(...(TROPHIES[S.hero] || []).map((t) => {
-    const used = spent(t.key).attr;
-    return el('label', {},
-      el('input', {
-        type: 'checkbox',
-        checked: S.trophy === t.key || null,
-        onchange: (e) => {
-          snapshot();
-          S.trophy = e.target.checked ? t.key : null;
-          render();
-        },
-      }),
-      el('span', {}, `${t.label} (${t.attr - used} of ${t.attr} left)`));
+    const given = S.granted.includes(t.key);
+    return el('button', {
+      class: `trophy${given ? ' given' : ''}`,
+      disabled: given || null,
+      onclick: () => {
+        snapshot();
+        S.granted.push(t.key);
+        render();
+      },
+    },
+      el('span', { class: 'trophy-label' }, t.label),
+      el('span', { class: 'trophy-gain' }, given ? 'granted' : `+${t.attr} AP`));
   }));
 
   const undoBtn = document.getElementById('undo');

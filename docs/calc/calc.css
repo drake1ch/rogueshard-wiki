@@ -94,7 +94,29 @@
 .attrs button:disabled { opacity: .35; cursor: default; }
 .attrs button:not(:disabled):hover { border-color: var(--available); color: var(--available); }
 
-.trophies { margin-bottom: 12px; }
+.trophies { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+
+.trophy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.trophy:hover:not(:disabled) { border-color: var(--new-good); }
+.trophy:disabled { opacity: .45; cursor: default; }
+.trophy-label { flex: 1; }
+.trophy-gain { color: var(--new-good); font-weight: 600; white-space: nowrap; }
+.trophy.given .trophy-gain { color: var(--dim); font-weight: 400; }
 .trophies label,
 .calc .check {
   display: flex;
