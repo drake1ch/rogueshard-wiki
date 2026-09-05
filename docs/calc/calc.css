@@ -290,9 +290,6 @@
 .tip .req.ok { color: var(--good); }
 .tip .req.no { color: var(--bad); }
 .tip p { margin: 7px 0 0; line-height: 1.45; }
-.tip .lg { color: var(--new-good); }
-.tip .w { color: #fff; }
-.tip .sy { color: #e8c56a; }
 .tip .formula { color: #8fd0ff; font-family: Consolas, monospace; font-size: 12px; }
 
 /* Строка «или» между двумя альтернативными требованиями в подсказке. */
@@ -300,3 +297,30 @@
 
 /* Стартовый навык: выдан перком, очков не стоит, снять нельзя. */
 .node .order.start { border-color: #8fd0ff; color: #8fd0ff; }
+
+/* Цвета меток разметки — как в игре (scr_colorTextColorsMap).
+   Сгенерировано tools/colors.py; править надо там, а не здесь. */
+.tip .c-w { color: #fff; }
+.tip .c-r { color: rgb(158, 27, 49); }
+.tip .c-dr { color: rgb(191, 0, 0); }
+.tip .c-lr { color: rgb(197, 92, 92); }
+.tip .c-ur { color: rgb(236, 77, 73); }
+.tip .c-lsr { color: rgb(172, 60, 81); }
+.tip .c-pr { color: rgb(167, 125, 135); }
+.tip .c-lg { color: rgb(114, 222, 142); }
+.tip .c-g { color: rgb(14, 215, 142); }
+.tip .c-cg { color: rgb(94, 239, 37); }
+.tip .c-gr { color: rgb(157, 154, 154); }
+.tip .c-grm { color: rgb(113, 114, 94); }
+.tip .c-grs { color: rgb(80, 80, 87); }
+.tip .c-grd { color: rgb(74, 72, 86); }
+.tip .c-mpb { color: rgb(23, 98, 171); }
+.tip .c-bl { color: rgb(39, 177, 234); }
+.tip .c-y { color: rgb(246, 187, 21); }
+.tip .c-сy { color: rgb(254, 228, 108); }
+.tip .c-ly { color: rgb(255, 246, 181); }
+.tip .c-sy { color: rgb(213, 178, 146); }
+.tip .c-o { color: rgb(242, 141, 49); }
+.tip .c-p { color: rgb(152, 114, 236); }
+.tip .c-dp { color: rgb(130, 72, 188); }
+.tip .c-c { color: rgb(115, 192, 222); }

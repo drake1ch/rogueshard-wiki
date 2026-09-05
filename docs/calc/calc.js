@@ -454,12 +454,14 @@ function describe(node) {
     for (const piece of chunk.split('#')) {
       if (p.childNodes.length) p.append(el('br', {}));
       // ~lg~текст~/~ — цветной кусок.
+      // ~r~-6%~/~ — цветной кусок. Метки не перечисляем: их два десятка, и
+      // список в коде разъезжался бы с игрой. Незнакомая метка просто даст
+      // класс без правила, то есть обычный цвет, — но текст не потеряется.
       const parts = piece.split(/~(\w+)~|~\/~/);
       let cls = '';
       for (let i = 0; i < parts.length; i++) {
         const t = parts[i];
-        if (t === undefined) { cls = ''; continue; }
-        if (/^(lg|w|sy|r|y|b)$/.test(t) && i % 2 === 1) { cls = t; continue; }
+        if (i % 2 === 1) { cls = t === undefined ? '' : `c-${t}`; continue; }
         if (!t) continue;
         p.append(el('span', { class: cls }, ...fillValues(t, node)));
       }
