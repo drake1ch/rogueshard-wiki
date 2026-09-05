@@ -205,8 +205,9 @@ function spendAttr(attr) {
 }
 
 function levelUp() {
+  // Отдельной строки про сам уровень в логе нет: номер уровня и так стоит
+  // слева у каждой записи о трате.
   S.level += 1;
-  S.log.push({ level: S.level, text: `— level ${S.level} —`, head: true });
   render();
 }
 
@@ -271,8 +272,8 @@ function renderHero() {
   }));
 
   const log = document.getElementById('log');
-  log.replaceChildren(...S.log.map((l) => el('li', { class: l.head ? 'head' : '' },
-    l.head ? null : el('span', { class: 'lv' }, l.level),
+  log.replaceChildren(...S.log.map((l) => el('li', {},
+    el('span', { class: 'lv' }, l.level),
     l.text,
     l.note ? el('span', { class: 'bonus' }, ` — ${l.note}`) : null)));
 }

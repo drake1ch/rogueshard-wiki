@@ -153,13 +153,7 @@
   font-size: 12px;
 }
 .log li { padding: 2px 0; color: var(--dim); break-inside: avoid; }
-.log li.head {
-  color: var(--text);
-  font-weight: 600;
-  margin-top: 6px;
-  border-top: 1px solid var(--line);
-  padding-top: 5px;
-}
+
 .log .lv { color: var(--text); font-weight: 600; margin-right: 6px; }
 .log .bonus { color: var(--new-good); }
 
