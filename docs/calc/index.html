@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Calculator — Rogue Shard Wiki</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="calc.css">
+</head>
+<body>
+
+<nav class="crumbs"><a href="../index.html">Rogue Shard Wiki</a><i>›</i><span>Build Calculator</span></nav>
+
+<div class="calc">
+
+  <aside class="hero" id="hero">
+    <div class="hero-pick">
+      <select id="character"></select>
+    </div>
+
+    <div class="hero-card">
+      <img class="hero-face" id="face" alt="">
+      <div class="hero-id">
+        <div class="hero-name" id="heroName"></div>
+        <div class="hero-class" id="heroClass"></div>
+        <div class="hero-level">Level <b id="level">1</b></div>
+      </div>
+    </div>
+
+    <div class="points">
+      <div class="point" id="pointSkill"><span>Skill points</span><b>0</b></div>
+      <div class="point" id="pointAttr"><span>Attribute points</span><b>0</b></div>
+    </div>
+
+    <ul class="attrs" id="attrs"></ul>
+
+    <div class="trophies" id="trophies"></div>
+
+    <div class="controls">
+      <button id="levelUp" class="primary">Level up</button>
+      <button id="reset">Reset</button>
+    </div>
+
+    <label class="check"><input type="checkbox" id="formulaMode"> Show formulas instead of numbers</label>
+
+    <div class="log-wrap">
+      <div class="log-head">Log</div>
+      <ol class="log" id="log"></ol>
+    </div>
+  </aside>
+
+  <main class="trees">
+    <div class="tree-add">
+      <select id="addBranch"><option value="">+ add a skill tree…</option></select>
+    </div>
+    <div class="tree-grid" id="treeGrid"></div>
+  </main>
+
+</div>
+
+<div class="tip" id="tip" hidden></div>
+
+<script src="data.js"></script>
+<script src="calc.js"></script>
+</body>
+</html>
