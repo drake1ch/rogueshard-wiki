@@ -493,11 +493,12 @@ function render() { renderHero(); renderTrees(); }
 
 function boot() {
   DATA = window.CALC_DATA;
-  DATA.characters.sort((a, b) => a.key.localeCompare(b.key));
 
+  // Порядок героев не трогаем: он идёт из scr_classCreate, то есть тот же,
+  // в каком они стоят в меню выбора персонажа. Класс виден в панели ниже.
   const pick = document.getElementById('character');
   pick.replaceChildren(...DATA.characters.map((c) =>
-    el('option', { value: c.key }, `${c.key} — ${c.class}`)));
+    el('option', { value: c.key }, c.key)));
 
   S = freshState(DATA.characters[0].key);
 
