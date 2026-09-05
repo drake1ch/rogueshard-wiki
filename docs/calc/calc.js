@@ -289,11 +289,25 @@ function renderTrees() {
       .map((b) => el('option', { value: b.key }, b.name.replace(/_/g, ' '))));
 }
 
+// Во сколько раз игровые координаты крупнее на странице. При четырёх ветках
+// в ряд панель выходит около 330px, и четыре умещаются рядом с героем.
+const SCALE = 2;
+
+/** Высота самой длинной ветки: по ней равняются все панели. */
+function tallestBranch() {
+  let tall = 0;
+  for (const b of DATA.branches) {
+    const ys = b.nodes.map((n) => n.y - n.geom[3]);
+    const h = Math.max(...b.nodes.map((n) => n.y - n.geom[3] + n.geom[1]))
+            - (Math.min(...ys) - 12) + 12;
+    if (h > tall) tall = h;
+  }
+  return tall;
+}
+
 function renderTree(key) {
   const b = DATA.branches.find((x) => x.key === key);
-  // 2.5, а не 3: при тройке в ряд три панели по 187 игровых пикселей шириной
-  // должны уместиться рядом с панелью героя.
-  const scale = 2.5;
+  const scale = SCALE;
 
   // Габарит ветки, чтобы панель была ровно по содержимому.
   const xs = b.nodes.map((n) => n.x - n.geom[2]);
@@ -303,9 +317,11 @@ function renderTree(key) {
   const w = Math.max(...b.nodes.map((n) => n.x - n.geom[2] + n.geom[0])) - minX + 12;
   const h = Math.max(...b.nodes.map((n) => n.y - n.geom[3] + n.geom[1])) - minY + 12;
 
+  // Все панели одной высоты — по самой длинной ветке, иначе ряд выглядит
+  // рваным. Лишнее место внизу просто остаётся фоном.
   const body = el('div', {
     class: 'tree-body',
-    style: `width:${w * scale}px;height:${h * scale}px`,
+    style: `width:${w * scale}px;height:${Math.max(h, tallestBranch()) * scale}px`,
   });
 
   for (const ln of b.lines) {
