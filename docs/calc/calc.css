@@ -238,3 +238,6 @@
 .tip .w { color: #fff; }
 .tip .sy { color: #e8c56a; }
 .tip .formula { color: #8fd0ff; font-family: Consolas, monospace; font-size: 12px; }
+
+/* Строка «или» между двумя альтернативными требованиями в подсказке. */
+.tip .row.alt { color: var(--dim); font-style: italic; padding-left: 8px; }

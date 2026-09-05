@@ -16,14 +16,14 @@ const ATTR_ALIAS = { Vitality: 'VIT', VIT: 'VIT' };
 // доступный пул, а потраченное в каждом запоминается.
 const TROPHIES = {
   Velmir: [
-    { key: 'troll', label: 'Дополнительные очки за Древнего троля', attr: 2, note: 'ОА за Древнего троля' },
-    { key: 'manticore', label: 'Дополнительные очки за Мантикору', attr: 2, note: 'ОА за Мантикору' },
+    { key: 'troll', label: 'Bonus points for the Ancient Troll', attr: 2, note: 'AP from the Ancient Troll' },
+    { key: 'manticore', label: 'Bonus points for the Manticore', attr: 2, note: 'AP from the Manticore' },
   ],
   Jorgrim: [
-    { key: 'boss', label: 'Дополнительные очки за трофеи боссов', attr: 3, note: 'бонусное ОА за трофеи боссов' },
+    { key: 'boss', label: 'Bonus points for boss trophies', attr: 3, note: 'bonus AP from boss trophies' },
   ],
   Hilda: [
-    { key: 'animal', label: 'Дополнительные очки за трофеи животных', attr: 2, note: 'бонусное ОА за трофеи животных' },
+    { key: 'animal', label: 'Bonus points for animal trophies', attr: 2, note: 'bonus AP from animal trophies' },
   ],
 };
 
@@ -101,17 +101,36 @@ function nodeOf(obj) {
 
 function isLearned(obj) { return S.learned.some((l) => l.obj === obj); }
 
+/** Сумма атрибутов навыка сверх базовой десятки — так считает игра. */
+function attrOver(node) {
+  return (node.attrs || []).reduce(
+    (t, a) => t + (attrValue(ATTR_ALIAS[a] || a) - 10), 0);
+}
+
+function requirementText(node, over) {
+  const parts = [];
+  if (node.level > 1) parts.push(`level ${node.level}`);
+  if (node.attrValue > 0 && node.attrs.length) {
+    const names = node.attrs.map((a) => ATTR_NAME[ATTR_ALIAS[a] || a] || a).join(' + ');
+    parts.push(`${names} ≥ ${node.attrValue} over 10 (now ${over})`);
+  }
+  return `Requires ${parts.join(' or ')}`;
+}
+
 /** Почему навык нельзя взять — или null, если можно. */
 function blockedBy(node) {
   if (isLearned(node.obj)) return 'learned';
-  if (S.level < node.level) return `Requires level ${node.level}`;
 
-  if (node.attrValue > 0 && node.attrs.length) {
-    const sum = node.attrs.reduce((t, a) => t + attrValue(ATTR_ALIAS[a] || a), 0);
-    if (sum < node.attrValue) {
-      const names = node.attrs.map((a) => ATTR_NAME[ATTR_ALIAS[a] || a] || a).join(' + ');
-      return `Requires ${names} ≥ ${node.attrValue} (now ${sum})`;
-    }
+  // Уровень и атрибуты — АЛЬТЕРНАТИВЫ: в o_skill_ico_Other_11 каждая проверка
+  // снимает замок сама по себе. И считается не сумма атрибутов, а сумма
+  // превышения над базовой десяткой: `_attributes_points += _attribute - 10`.
+  const needLevel = node.level > 1;
+  const needAttrs = node.attrValue > 0 && node.attrs.length > 0;
+  if (needLevel || needAttrs) {
+    const byLevel = needLevel && S.level >= node.level;
+    const over = attrOver(node);
+    const byAttrs = needAttrs && over >= node.attrValue;
+    if (!byLevel && !byAttrs) return requirementText(node, over);
   }
 
   // needs — это группы: внутри группы нужны все навыки, а групп достаточно
@@ -131,10 +150,13 @@ function blockedBy(node) {
 
 function learn(node, branch) {
   if (blockedBy(node)) return;
-  S.learned.push({ obj: node.obj, branch: branch.key, level: S.level, pool: '' });
-  logLine(`${node.name.en}`, '');
+  const id = ++logId;
+  S.learned.push({ obj: node.obj, branch: branch.key, level: S.level, pool: '', logId: id });
+  logLine(`${node.name.en}`, '', id);
   render();
 }
+
+let logId = 0;
 
 function unlearn(obj) {
   // Снять можно только навык, на котором ничего не держится.
@@ -143,9 +165,10 @@ function unlearn(obj) {
     return found && (found.node.needs || []).some((g) => g.includes(obj));
   });
   if (dependents.length) return;
+  // Строка лога снимается вместе с навыком, а не дописывается новой.
+  const gone = S.learned.find((l) => l.obj === obj);
   S.learned = S.learned.filter((l) => l.obj !== obj);
-  const found = nodeOf(obj);
-  logLine(`− ${found ? found.node.name.en : obj}`, null, true);
+  if (gone) S.log = S.log.filter((l) => l.id !== gone.logId);
   render();
 }
 
@@ -163,9 +186,9 @@ function levelUp() {
   render();
 }
 
-function logLine(text, pool, removed) {
+function logLine(text, pool, id) {
   const note = pool ? (TROPHIES[S.hero] || []).find((t) => t.key === pool) : null;
-  S.log.push({ level: S.level, text, note: note ? note.note : '', removed: !!removed });
+  S.log.push({ id, level: S.level, text, note: note ? note.note : '' });
 }
 
 /* --- отрисовка ---------------------------------------------------------- */
@@ -387,11 +410,16 @@ function showTip(e, node) {
     el('h4', {}, node.name.en),
     el('div', { class: 'kind' }, node.passive ? 'Passive' : 'Active'),
     el('hr', {}),
-    node.level > 1 ? el('div', { class: 'row' }, el('span', {}, 'Unlocks at level'), el('b', {}, node.level)) : null,
+    node.level > 1
+      ? el('div', { class: 'row' }, el('span', {}, 'Unlocks at level'), el('b', {}, node.level))
+      : null,
+    node.level > 1 && node.attrValue > 0
+      ? el('div', { class: 'row alt' }, el('span', {}, 'or'), el('b', {}, ''))
+      : null,
     node.attrValue > 0
       ? el('div', { class: 'row' },
-          el('span', {}, node.attrs.map((a) => ATTR_ALIAS[a] || a).join(' + ')),
-          el('b', {}, `≥ ${node.attrValue}`))
+          el('span', {}, `${node.attrs.map((a) => ATTR_ALIAS[a] || a).join(' + ')} over 10`),
+          el('b', {}, `≥ ${node.attrValue} (now ${attrOver(node)})`))
       : null,
     mods.length ? el('div', { class: 'row' }, el('span', {}, 'Modified by'), el('b', {}, mods.join(', '))) : null,
     el('hr', {}),
