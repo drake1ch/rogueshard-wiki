@@ -278,8 +278,11 @@ function renderHero() {
 }
 
 function renderTrees() {
+  // Лог живёт внутри сетки последней ячейкой во всю строку: так его ширина
+  // всегда равна ширине ряда веток.
   const grid = document.getElementById('treeGrid');
-  grid.replaceChildren(...S.open.map(renderTree));
+  const log = document.querySelector('.log-wrap');
+  grid.replaceChildren(...S.open.map(renderTree), log);
 
   const add = document.getElementById('addBranch');
   add.replaceChildren(
