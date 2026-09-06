@@ -6,7 +6,74 @@
 'use strict';
 
 const ATTRS = ['STR', 'AGL', 'PRC', 'VIT', 'WIL'];
-const ATTR_NAME = { STR: 'Strength', AGL: 'Agility', PRC: 'Perception', VIT: 'Vitality', WIL: 'Willpower' };
+
+/* --- язык ---------------------------------------------------------------
+ *
+ * Выбор хранится под тем же ключом, что и на страницах снаряжения, поэтому
+ * переключённый там язык остаётся переключённым и здесь.
+ *
+ * Названия навыков, их описания и названия веток приходят из игры сразу на
+ * двух языках — их достаточно достать через loc(). Здесь лежит только то,
+ * чего в игре нет: подписи самого калькулятора.
+ */
+let LANG = 'en';
+try { if (localStorage.getItem('rs-lang') === 'ru') LANG = 'ru'; } catch (e) { /* приватное окно */ }
+
+/** Значение из данных игры: {ru, en} — или уже готовая строка. */
+function loc(v) {
+  if (v === null || v === undefined) return '';
+  return typeof v === 'string' ? v : (v[LANG] || v.en || '');
+}
+
+const T = {
+  addTree:     ['+ add a skill tree…',    '+ добавить ветку…'],
+  log:         ['Log',                    'Прокачка'],
+  level:       ['Level',                  'Уровень'],
+  skillPoints: ['Skill points',           'Очки способностей'],
+  attrPoints:  ['Attribute points',       'Очки атрибутов'],
+  levelUp:     ['Level up',               'Повысить уровень'],
+  undo:        ['Undo',                   'Отменить'],
+  reset:       ['Reset',                  'Сбросить'],
+  formulas:    ['Show formulas instead of numbers', 'Показывать формулы вместо чисел'],
+  share:       ['Copy build link',        'Скопировать ссылку'],
+  shareDone:   ['Link copied',            'Ссылка скопирована'],
+  shareFail:   ['Copy failed — the link is in the address bar',
+                'Не скопировалось — ссылка в адресной строке'],
+  title:       ['Build Calculator',       'Калькулятор билдов'],
+  wiki:        ['Rogue Shard Wiki',       'Вики Rogue Shard'],
+  close:       ['Close',                  'Закрыть'],
+  passive:     ['Passive',                'Пассивная'],
+  active:      ['Active',                 'Активная'],
+  unlocksAt:   ['Unlocks at level',       'Открывается на уровне'],
+  or:          ['or',                     'или'],
+  over10:      ['over 10',                'сверх 10'],
+  now:         ['now',                    'сейчас'],
+  modifiedBy:  ['Modified by',            'Зависит от'],
+  startSkill:  ['starting skill',         'стартовый навык'],
+  noPoints:    ['No skill points left',   'Очков способностей не осталось'],
+  requires:    ['Requires',               'Требуется'],
+  levelWord:   ['level',                  'уровень'],
+  oldLink:     ['This link is from an older version of the calculator — the build was restored only in part.',
+                'Ссылка от старой версии калькулятора — билд восстановлен не полностью.'],
+};
+
+function t(key) { return pick(T[key] || ['', '']); }
+
+/** Пара [en, ru] -> нужный язык. */
+function pick(pair) { return Array.isArray(pair) ? pair[LANG === 'ru' ? 1 : 0] : pair; }
+
+const ATTR_NAMES = {
+  STR: ['Strength', 'Сила'],
+  AGL: ['Agility', 'Ловкость'],
+  PRC: ['Perception', 'Восприятие'],
+  VIT: ['Vitality', 'Живучесть'],
+  WIL: ['Willpower', 'Воля'],
+};
+
+function attrName(a) { return (ATTR_NAMES[a] || [a, a])[LANG === 'ru' ? 1 : 0]; }
+
+// Оставлено ради мест, где имя атрибута нужно как обычная строка.
+const ATTR_NAME = new Proxy({}, { get: (_, k) => attrName(String(k)) });
 
 // Требования в игре записаны через Vitality, а не VIT.
 const ATTR_ALIAS = { Vitality: 'VIT', VIT: 'VIT' };
@@ -16,20 +83,38 @@ const ATTR_ALIAS = { Vitality: 'VIT', VIT: 'VIT' };
 // доступный пул, а потраченное в каждом запоминается.
 const TROPHIES = {
   Velmir: [
-    { key: 'troll', label: 'Bonus points for the Ancient Troll', attr: 2, note: 'AP from the Ancient Troll' },
-    { key: 'manticore', label: 'Bonus points for the Manticore', attr: 2, note: 'AP from the Manticore' },
+    { key: 'troll', attr: 2,
+      label: ['Bonus points for the Ancient Troll', 'Очки за Древнего тролля'],
+      note: ['AP from the Ancient Troll', 'очки за Древнего тролля'] },
+    { key: 'manticore', attr: 2,
+      label: ['Bonus points for the Manticore', 'Очки за Мантикору'],
+      note: ['AP from the Manticore', 'очки за Мантикору'] },
   ],
   Jorgrim: [
-    { key: 'boss', label: 'Bonus points for boss trophies', attr: 3, note: 'bonus AP from boss trophies' },
+    { key: 'boss', attr: 3,
+      label: ['Bonus points for boss trophies', 'Очки за трофеи боссов'],
+      note: ['bonus AP from boss trophies', 'очки за трофеи боссов'] },
   ],
   Hilda: [
-    { key: 'animal', label: 'Bonus points for animal trophies', attr: 2, note: 'bonus AP from animal trophies' },
+    { key: 'animal', attr: 2,
+      label: ['Bonus points for animal trophies', 'Очки за трофеи зверей'],
+      note: ['bonus AP from animal trophies', 'очки за трофеи зверей'] },
   ],
 };
 
 // Дирвин получает по очку способностей и атрибутов за каждый третий навык
 // Выживания. Отдельной галочки у них нет — работают как обычные.
 const DIRWIN_BRANCH = 'survival';
+
+// Махир — за ветки, а не за отдельные навыки: как только в ветке выучено
+// шесть навыков, она приносит одно очко способностей. Веток, которые могут
+// заплатить, не больше пяти, и очка атрибутов среди наград нет.
+//
+// В перке (o_perk_lifelong_journey) это `categorySkillsOpenNonStart == 6` под
+// проверками `SkillsOpened < 5` и «эта ветка ещё не платила»; стартовые навыки
+// в счёт не идут — на то и NonStart.
+const MAHIR_PER_BRANCH = 6;
+const MAHIR_MAX_BRANCHES = 5;
 
 // Потолок атрибута. Игра говорит об этом прямо в описании: «Макс. значение
 // силы — 30 ед.»
@@ -66,8 +151,8 @@ function freshState(charKey) {
     log: start.map((l) => ({
       id: 0,
       level: '',
-      text: nodeOf(l.obj) ? nodeOf(l.obj).node.name.en : l.obj,
-      note: 'starting skill',
+      text: nodeOf(l.obj) ? loc(nodeOf(l.obj).node.name) : l.obj,
+      note: t('startSkill'),
     })),
   };
 }
@@ -87,6 +172,17 @@ function granted() {
     const n = Math.floor(learnedHere.length / 3);
     out[''].skill += n;
     out[''].attr += n;
+  }
+
+  // Махир: считаем ветки, где набралось шесть выученных навыков.
+  if (S.hero === 'Mahir') {
+    const perBranch = {};
+    for (const l of S.learned) {
+      if (l.pool === START) continue;
+      perBranch[l.branch] = (perBranch[l.branch] || 0) + 1;
+    }
+    const paid = Object.values(perBranch).filter((n) => n >= MAHIR_PER_BRANCH).length;
+    out[''].skill += Math.min(paid, MAHIR_MAX_BRANCHES);
   }
 
   // Трофейный пул существует только после нажатия кнопки.
@@ -145,12 +241,12 @@ function attrOver(node) {
 
 function requirementText(node, over) {
   const parts = [];
-  if (node.level > 1) parts.push(`level ${node.level}`);
+  if (node.level > 1) parts.push(`${t('levelWord')} ${node.level}`);
   if (node.attrValue > 0 && node.attrs.length) {
-    const names = node.attrs.map((a) => ATTR_NAME[ATTR_ALIAS[a] || a] || a).join(' + ');
-    parts.push(`${names} ≥ ${node.attrValue} over 10 (now ${over})`);
+    const names = node.attrs.map((a) => attrName(ATTR_ALIAS[a] || a)).join(' + ');
+    parts.push(`${names} ≥ ${node.attrValue} ${t('over10')} (${t('now')} ${over})`);
   }
-  return `Requires ${parts.join(' or ')}`;
+  return `${t('requires')} ${parts.join(` ${t('or')} `)}`;
 }
 
 /** Почему навык нельзя взять — или null, если можно. */
@@ -175,12 +271,12 @@ function blockedBy(node) {
   // любой (правило checkConnected из ctr_SkillConnection).
   const groups = node.needs || [];
   if (groups.length && !groups.some((g) => g.every(isLearned))) {
-    const name = (o) => (nodeOf(o) ? nodeOf(o).node.name.en : o);
+    const name = (o) => (nodeOf(o) ? loc(nodeOf(o).node.name) : o);
     const variants = groups.map((g) => g.map(name).join(' + '));
-    return `Requires ${variants.join(' or ')}`;
+    return `${t('requires')} ${variants.join(` ${t('or')} `)}`;
   }
 
-  if (left('skill') <= 0) return 'No skill points left';
+  if (left('skill') <= 0) return t('noPoints');
   return null;
 }
 
@@ -210,7 +306,7 @@ function learn(node, branch) {
   snapshot();
   const id = ++logId;
   S.learned.push({ obj: node.obj, branch: branch.key, level: S.level, pool: '', logId: id });
-  logLine(`${node.name.en}`, '', id);
+  logLine(loc(node.name), '', id);
   render();
 }
 
@@ -254,7 +350,7 @@ function levelUp() {
 
 function logLine(text, pool, id) {
   const note = pool ? (TROPHIES[S.hero] || []).find((t) => t.key === pool) : null;
-  S.log.push({ id, level: S.level, text, note: note ? note.note : '' });
+  S.log.push({ id, level: S.level, text, note: note ? pick(note.note) : '' });
 }
 
 /* --- отрисовка ---------------------------------------------------------- */
@@ -313,7 +409,7 @@ function renderHero() {
         render();
       },
     },
-      el('span', { class: 'trophy-label' }, t.label),
+      el('span', { class: 'trophy-label' }, pick(t.label)),
       el('span', { class: 'trophy-gain' }, given ? 'granted' : `+${t.attr} AP`));
   }));
 
@@ -335,12 +431,22 @@ function renderTrees() {
   const grid = document.getElementById('treeGrid');
   grid.replaceChildren(...S.open.map(renderTree));
 
+  // Ветки идут в том же порядке и теми же тремя группами, что в окне умений:
+  // порядок задан в data.js, здесь он только разбивается на optgroup.
   const add = document.getElementById('addBranch');
+  const groups = [];
+  for (const b of DATA.branches) {
+    if (S.open.includes(b.key)) continue;
+    const title = loc(b.group);
+    if (!groups.length || groups[groups.length - 1].title !== title) {
+      groups.push({ title, items: [] });
+    }
+    groups[groups.length - 1].items.push(b);
+  }
   add.replaceChildren(
-    el('option', { value: '' }, '+ add a skill tree…'),
-    ...DATA.branches
-      .filter((b) => !S.open.includes(b.key))
-      .map((b) => el('option', { value: b.key }, b.name.replace(/_/g, ' '))));
+    el('option', { value: '' }, t('addTree')),
+    ...groups.map((g) => el('optgroup', { label: g.title },
+      ...g.items.map((b) => el('option', { value: b.key }, loc(b.name).replace(/_/g, ' '))))));
 }
 
 // Во сколько раз игровые координаты крупнее на странице. 2.5 — размер, на
@@ -412,10 +518,10 @@ function renderTree(key) {
 
   return el('section', { class: 'tree' },
     el('div', { class: 'tree-head' },
-      el('span', { class: 'tree-title' }, b.name.replace(/_/g, ' ')),
+      el('span', { class: 'tree-title' }, loc(b.name).replace(/_/g, ' ')),
       el('button', {
         class: 'tree-close',
-        title: 'Close',
+        title: t('close'),
         onclick: () => { S.open = S.open.filter((k) => k !== key); render(); },
       }, '✕')),
     body);
@@ -446,7 +552,7 @@ function compute(expr) {
 
 /** Описание из таблицы: цветовые теги, переносы и подстановка значений. */
 function describe(node) {
-  const raw = node.desc.en || '';
+  const raw = loc(node.desc) || '';
   const out = document.createElement('div');
 
   for (const chunk of raw.split('##')) {
@@ -499,26 +605,26 @@ function fillValues(text, node) {
 function showTip(e, node) {
   const tip = document.getElementById('tip');
   const blocked = blockedBy(node);
-  const mods = (node.modifiedBy || []).map((a) => ATTR_NAME[ATTR_ALIAS[a] || a] || a.replace(/_/g, ' '));
+  const mods = (node.modifiedBy || []).map((a) => (ATTR_NAMES[ATTR_ALIAS[a] || a] ? attrName(ATTR_ALIAS[a] || a) : a.replace(/_/g, ' ')));
 
   // replaceChildren превращает null в текстовый узел «null», поэтому пустые
   // строки надо отсеять, а не просто вернуть null вместо элемента.
   const rows = [
-    el('h4', {}, node.name.en),
-    el('div', { class: 'kind' }, node.passive ? 'Passive' : 'Active'),
+    el('h4', {}, loc(node.name)),
+    el('div', { class: 'kind' }, node.passive ? t('passive') : t('active')),
     el('hr', {}),
     !node.tier1 && node.level > 1
-      ? el('div', { class: 'row' }, el('span', {}, 'Unlocks at level'), el('b', {}, node.level))
+      ? el('div', { class: 'row' }, el('span', {}, t('unlocksAt')), el('b', {}, node.level))
       : null,
     !node.tier1 && node.level > 1 && node.attrValue > 0
-      ? el('div', { class: 'row alt' }, el('span', {}, 'or'), el('b', {}, ''))
+      ? el('div', { class: 'row alt' }, el('span', {}, t('or')), el('b', {}, ''))
       : null,
     !node.tier1 && node.attrValue > 0
       ? el('div', { class: 'row' },
-          el('span', {}, `${node.attrs.map((a) => ATTR_ALIAS[a] || a).join(' + ')} over 10`),
-          el('b', {}, `≥ ${node.attrValue} (now ${attrOver(node)})`))
+          el('span', {}, `${node.attrs.map((a) => ATTR_ALIAS[a] || a).join(' + ')} ${t('over10')}`),
+          el('b', {}, `≥ ${node.attrValue} (${t('now')} ${attrOver(node)})`))
       : null,
-    mods.length ? el('div', { class: 'row' }, el('span', {}, 'Modified by'), el('b', {}, mods.join(', '))) : null,
+    mods.length ? el('div', { class: 'row' }, el('span', {}, t('modifiedBy')), el('b', {}, mods.join(', '))) : null,
     el('hr', {}),
     describe(node),
     blocked && blocked !== 'learned' ? el('hr', {}) : null,
@@ -543,6 +649,180 @@ function moveTip(e) {
 
 function hideTip() { document.getElementById('tip').hidden = true; }
 
+/* --- ссылка на билд ------------------------------------------------------
+ *
+ * В адрес кладётся сам билд, а не ссылка на сохранённое где-то состояние:
+ * страница статическая, сервера у неё нет, и делиться больше нечем.
+ *
+ * Навыки и ветки записаны номерами: имена объектов вроде
+ * o_pass_skill_blow_after_blow длинные, а ссылку человеку ещё отправлять.
+ * Номер — позиция в общем списке узлов; он держится, пока в дереве ничего не
+ * переставляли, поэтому в начале стоит версия. Ссылка, собранная до
+ * перестановки, восстановится частично и скажет об этом.
+ */
+const SHARE_VERSION = 1;
+
+/** Плоский список всех узлов в порядке данных: индекс <-> объект. */
+const FLAT = [];
+const FLAT_INDEX = {};
+
+function buildFlat() {
+  FLAT.length = 0;
+  for (const b of DATA.branches) {
+    for (const n of b.nodes) {
+      FLAT_INDEX[n.obj] = FLAT.length;
+      FLAT.push({ obj: n.obj, branch: b.key });
+    }
+  }
+}
+
+function toBase64Url(text) {
+  const bytes = new TextEncoder().encode(text);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromBase64Url(text) {
+  const pad = text.replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(pad + '='.repeat((4 - (pad.length % 4)) % 4));
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function encodeBuild() {
+  const trophies = TROPHIES[S.hero] || [];
+  const short = {
+    v: SHARE_VERSION,
+    h: S.hero,
+    l: S.level,
+    // Стартовые навыки не пишем: их выдаёт сам персонаж, и при разборе
+    // ссылки они появятся снова.
+    s: S.learned.filter((x) => x.pool !== START)
+        .map((x) => (x.pool ? [FLAT_INDEX[x.obj], x.level, x.pool]
+                            : [FLAT_INDEX[x.obj], x.level])),
+    a: S.attrSpent.map((x) => (x.pool ? [ATTRS.indexOf(x.attr), x.level, x.pool]
+                                      : [ATTRS.indexOf(x.attr), x.level])),
+    g: S.granted.map((k) => trophies.findIndex((t) => t.key === k)),
+    o: S.open.map((k) => DATA.branches.findIndex((b) => b.key === k)),
+  };
+  return toBase64Url(JSON.stringify(short));
+}
+
+/** Разбирает ссылку в состояние. Возвращает false, если данные не подошли. */
+function decodeBuild(code) {
+  let d;
+  try { d = JSON.parse(fromBase64Url(code)); } catch (e) { return false; }
+  if (!d || d.v !== SHARE_VERSION) return false;
+  if (!DATA.characters.some((c) => c.key === d.h)) return false;
+
+  const trophies = TROPHIES[d.h] || [];
+  const state = freshState(d.h);
+  let complete = true;
+
+  state.level = Math.min(Math.max(1, d.l | 0), LEVEL_CAP);
+  state.granted = (d.g || []).map((i) => (trophies[i] || {}).key).filter(Boolean);
+  state.open = (d.o || []).map((i) => (DATA.branches[i] || {}).key).filter(Boolean);
+  if (state.open.length !== (d.o || []).length) complete = false;
+
+  for (const [index, level, pool] of d.s || []) {
+    const flat = FLAT[index];
+    if (!flat) { complete = false; continue; }
+    state.learned.push({ obj: flat.obj, branch: flat.branch, level, pool: pool || '' });
+  }
+  for (const [index, level, pool] of d.a || []) {
+    const attr = ATTRS[index];
+    if (!attr) { complete = false; continue; }
+    state.attrSpent.push({ attr, level, pool: pool || '' });
+  }
+
+  S = state;
+  rebuildLog();
+  return complete;
+}
+
+/** Лог собирается заново: по уровням, внутри уровня сперва навыки.
+ *
+ * Порядок внутри одного уровня в ссылке не хранится — он ничего не решает
+ * в самом билде, а ссылку укоротил заметно.
+ */
+function rebuildLog() {
+  const start = S.learned.filter((l) => l.pool === START);
+  S.log = start.map((l) => ({
+    id: 0,
+    level: '',
+    text: nodeOf(l.obj) ? loc(nodeOf(l.obj).node.name) : l.obj,
+    note: t('startSkill'),
+  }));
+
+  const trophies = TROPHIES[S.hero] || [];
+  const noteOf = (pool) => {
+    const found = pool ? trophies.find((x) => x.key === pool) : null;
+    return found ? pick(found.note) : '';
+  };
+
+  const base = { STR: 0, AGL: 0, PRC: 0, VIT: 0, WIL: 0 };
+  for (const a of ATTRS) base[a] = hero().attrs[a];
+
+  for (let level = 1; level <= S.level; level++) {
+    for (const l of S.learned) {
+      if (l.pool === START || l.level !== level) continue;
+      l.logId = ++logId;
+      S.log.push({ id: l.logId, level, text: nodeOf(l.obj) ? loc(nodeOf(l.obj).node.name) : l.obj,
+                   note: noteOf(l.pool) });
+    }
+    for (const a of S.attrSpent) {
+      if (a.level !== level) continue;
+      base[a.attr] += 1;
+      S.log.push({ id: ++logId, level, text: `${attrName(a.attr)} → ${base[a.attr]}`,
+                   note: noteOf(a.pool) });
+    }
+  }
+}
+
+function shareLink() {
+  const code = encodeBuild();
+  // location.origin у файла с диска — строка "null", поэтому адрес берётся
+  // целиком и у него отрезается старый хэш.
+  const url = `${location.href.split('#')[0]}#b=${code}`;
+  try { history.replaceState(null, '', `#b=${code}`); } catch (e) { /* file:// */ }
+  const note = document.getElementById('shareNote');
+  const show = (text) => {
+    note.textContent = text;
+    note.hidden = false;
+    clearTimeout(shareLink.timer);
+    shareLink.timer = setTimeout(() => { note.hidden = true; }, 2500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => show(t('shareDone')),
+                                            () => show(t('shareFail')));
+  } else {
+    show(t('shareFail'));
+  }
+}
+
+/* --- переключатель языка ------------------------------------------------- */
+
+function applyStaticText() {
+  document.title = `${t('title')} — Rogue Shard Wiki`;
+  document.documentElement.lang = LANG;
+  for (const node of document.querySelectorAll('[data-t]')) {
+    node.textContent = t(node.getAttribute('data-t'));
+  }
+  for (const button of document.querySelectorAll('#lang button')) {
+    button.classList.toggle('on', button.getAttribute('data-lang') === LANG);
+  }
+}
+
+function setLang(next) {
+  if (next === LANG) return;
+  LANG = next;
+  try { localStorage.setItem('rs-lang', next); } catch (e) { /* приватное окно */ }
+  applyStaticText();
+  rebuildLog();
+  render();
+}
+
 /* --- запуск ------------------------------------------------------------- */
 
 function render() { renderHero(); renderTrees(); }
@@ -552,18 +832,38 @@ function boot() {
 
   // Порядок героев не трогаем: он идёт из scr_classCreate, то есть тот же,
   // в каком они стоят в меню выбора персонажа. Класс виден в панели ниже.
-  const pick = document.getElementById('character');
-  pick.replaceChildren(...DATA.characters.map((c) =>
+  const heroPick = document.getElementById('character');
+  heroPick.replaceChildren(...DATA.characters.map((c) =>
     el('option', { value: c.key }, c.key)));
+
+  buildFlat();
+  applyStaticText();
 
   S = freshState(DATA.characters[0].key);
 
-  pick.addEventListener('change', () => {
+  // Ссылка на билд: если она в адресе, начинаем не с чистого листа.
+  const shared = /[#&]b=([A-Za-z0-9\-_]+)/.exec(location.hash);
+  if (shared) {
+    const complete = decodeBuild(shared[1]);
+    if (!complete) {
+      const note = document.getElementById('shareNote');
+      note.textContent = t('oldLink');
+      note.hidden = false;
+    }
+  }
+
+  heroPick.value = S.hero;
+  heroPick.addEventListener('change', () => {
     HISTORY.length = 0;
     const open = S.open;
-    S = freshState(pick.value);
+    S = freshState(heroPick.value);
     S.open = open;
     render();
+  });
+  document.getElementById('share').addEventListener('click', shareLink);
+  document.getElementById('lang').addEventListener('click', (e) => {
+    const button = e.target.closest('button[data-lang]');
+    if (button) setLang(button.getAttribute('data-lang'));
   });
   document.getElementById('levelUp').addEventListener('click', levelUp);
   document.getElementById('undo').addEventListener('click', undo);

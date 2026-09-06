@@ -324,3 +324,34 @@
 .tip .c-p { color: rgb(152, 114, 236); }
 .tip .c-dp { color: rgb(130, 72, 188); }
 .tip .c-c { color: rgb(115, 192, 222); }
+
+/* --- переключатель языка и ссылка на билд -------------------------------- */
+
+.crumbs .lang { margin-left: auto; display: inline-flex; gap: 2px; }
+.crumbs { display: flex; align-items: center; gap: 6px; }
+
+.crumbs .lang button {
+  padding: 2px 8px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.crumbs .lang button:hover { color: var(--text); }
+.crumbs .lang button.on {
+  color: var(--text);
+  border-color: var(--available);
+  background: #2c3566;
+}
+
+/* Ответ на нажатие «скопировать»: сообщение живёт пару секунд и исчезает. */
+.share-note {
+  margin: -6px 0 12px;
+  font-size: 12px;
+  color: var(--new-good);
+  line-height: 1.35;
+}

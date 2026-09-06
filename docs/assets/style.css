@@ -338,3 +338,34 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
   .site-logo { grid-template-columns: 1fr; }
   .calc-button { justify-self: center; }
 }
+
+/* --- язык ----------------------------------------------------------------
+   Двуязычные надписи лежат в разметке парой, показывается одна. Страницы
+   статические, поэтому переключение — это класс на body, а не пересборка. */
+
+body.lang-en .ru { display: none; }
+body.lang-ru .en { display: none; }
+
+/* У предмета показывается одно название — то, на каком языке читают. */
+body.lang-ru .names .ru { font-size: 15px; font-weight: 600; color: var(--text); }
+body.lang-ru .gone-row .names .ru { color: var(--gone); text-decoration: line-through; }
+
+.crumbs { display: flex; align-items: center; gap: 6px; }
+.crumbs .lang { margin-left: auto; display: inline-flex; gap: 2px; }
+.crumbs .lang button {
+  padding: 2px 8px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.crumbs .lang button:hover { color: var(--text); }
+.crumbs .lang button.on {
+  color: var(--text);
+  border-color: var(--link);
+  background: var(--panel-3);
+}

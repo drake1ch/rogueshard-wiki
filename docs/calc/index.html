@@ -9,12 +9,17 @@
 </head>
 <body>
 
-<nav class="crumbs"><a href="../index.html">Rogue Shard Wiki</a><i>›</i><span>Build Calculator</span></nav>
+<nav class="crumbs">
+  <a href="../index.html" data-t="wiki">Rogue Shard Wiki</a><i>›</i><span data-t="title">Build Calculator</span>
+  <span class="lang" id="lang">
+    <button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button>
+  </span>
+</nav>
 
 <div class="calc">
 
   <section class="log-wrap">
-    <div class="log-head">Log</div>
+    <div class="log-head" data-t="log">Log</div>
     <ol class="log" id="log"></ol>
   </section>
 
@@ -28,13 +33,13 @@
       <div class="hero-id">
         <div class="hero-name" id="heroName"></div>
         <div class="hero-class" id="heroClass"></div>
-        <div class="hero-level">Level <b id="level">1</b></div>
+        <div class="hero-level"><span data-t="level">Level</span> <b id="level">1</b></div>
       </div>
     </div>
 
     <div class="points">
-      <div class="point" id="pointSkill"><span>Skill points</span><b>0</b></div>
-      <div class="point" id="pointAttr"><span>Attribute points</span><b>0</b></div>
+      <div class="point" id="pointSkill"><span data-t="skillPoints">Skill points</span><b>0</b></div>
+      <div class="point" id="pointAttr"><span data-t="attrPoints">Attribute points</span><b>0</b></div>
     </div>
 
     <ul class="attrs" id="attrs"></ul>
@@ -42,12 +47,17 @@
     <div class="trophies" id="trophies"></div>
 
     <div class="controls">
-      <button id="levelUp" class="primary">Level up</button>
-      <button id="undo" title="Ctrl+Z">Undo</button>
-      <button id="reset">Reset</button>
+      <button id="levelUp" class="primary" data-t="levelUp">Level up</button>
+      <button id="undo" title="Ctrl+Z" data-t="undo">Undo</button>
+      <button id="reset" data-t="reset">Reset</button>
     </div>
 
-    <label class="check"><input type="checkbox" id="formulaMode"> Show formulas instead of numbers</label>
+    <div class="controls">
+      <button id="share" data-t="share">Copy build link</button>
+    </div>
+    <div class="share-note" id="shareNote" hidden></div>
+
+    <label class="check"><input type="checkbox" id="formulaMode"> <span data-t="formulas">Show formulas instead of numbers</span></label>
 
   </aside>
 

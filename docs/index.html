@@ -4,168 +4,204 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gear — Rogue Shard Wiki</title>
-<link rel="stylesheet" href="assets/style.css?v=bb0e6d9f">
+<link rel="stylesheet" href="assets/style.css?v=5d9dd09c">
 </head>
-<body class="simple">
+<body class="simple lang-en">
+<script>
+/* Язык выбирается до отрисовки, иначе на долю секунды мигает чужой. Ключ
+   общий с калькулятором: выбранный там язык действует и здесь. */
+(function () {
+  try {
+    var lang = localStorage.getItem("rs-lang") === "ru" ? "ru" : "en";
+    document.body.classList.remove("lang-en", "lang-ru");
+    document.body.classList.add("lang-" + lang);
+    document.documentElement.lang = lang;
+  } catch (e) { /* приватное окно */ }
+})();
+</script>
+<nav class="crumbs"><span class="lang" id="lang"><button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button></span></nav>
 <header class="site-logo">
   <a class="calc-button" href="calc/index.html">
-    <span class="calc-button-title">Build Calculator</span>
-    <span class="calc-button-sub">plan a character</span>
+    <span class="calc-button-title"><span class="en">Build Calculator</span><span class="ru">Калькулятор билдов</span></span>
+    <span class="calc-button-sub"><span class="en">plan a character</span><span class="ru">собрать персонажа</span></span>
   </a>
   <img src="assets/logo.png" alt="Rogue Shard">
 </header>
 <header class="site-head">
   <img class="site-banner" src="assets/gear-banner.png" alt="Gear">
-  <h1>Gear</h1>
+  <h1><span class="en">Gear</span><span class="ru">Снаряжение</span></h1>
 </header>
 <main><div class="groups"><section class="tile-group" style="--cols:4">
-  <h2>One-Handed</h2>
+  <h2><span class="en">One-Handed</span><span class="ru">Одноручное</span></h2>
   <div class="tiles"><a class="tile" href="gear/one-handed-swords.html">
-  <span class="tile-name">Swords</span>
+  <span class="tile-name"><span class="en">Swords</span><span class="ru">Мечи</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_skonfertsword.png" alt=""></span>
-  <span class="tile-sub">32 items</span>
+  <span class="tile-sub">32 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/one-handed-axes.html">
-  <span class="tile-name">Axes</span>
+  <span class="tile-name"><span class="en">Axes</span><span class="ru">Топоры</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_knightlyhatchet.png" alt=""></span>
-  <span class="tile-sub">31 items</span>
+  <span class="tile-sub">31 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/one-handed-maces.html">
-  <span class="tile-name">Maces</span>
+  <span class="tile-name"><span class="en">Maces</span><span class="ru">Булавы</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_knightlymorningstar.png" alt=""></span>
-  <span class="tile-sub">47 items</span>
+  <span class="tile-sub">47 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/one-handed-daggers.html">
-  <span class="tile-name">Daggers</span>
+  <span class="tile-name"><span class="en">Daggers</span><span class="ru">Кинжалы</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_stiletto.png" alt=""></span>
-  <span class="tile-sub">22 items</span>
+  <span class="tile-sub">22 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:5">
-  <h2>Two-Handed</h2>
+  <h2><span class="en">Two-Handed</span><span class="ru">Двуручное</span></h2>
   <div class="tiles"><a class="tile" href="gear/two-handed-swords.html">
-  <span class="tile-name">Two-Handed Swords</span>
+  <span class="tile-name"><span class="en">Two-Handed Swords</span><span class="ru">Двуручные мечи</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_noblelongsword.png" alt=""></span>
-  <span class="tile-sub">22 items</span>
+  <span class="tile-sub">22 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/two-handed-axes.html">
-  <span class="tile-name">Two-Handed Axes</span>
+  <span class="tile-name"><span class="en">Two-Handed Axes</span><span class="ru">Двуручные топоры</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_knightlypoleaxe.png" alt=""></span>
-  <span class="tile-sub">30 items</span>
+  <span class="tile-sub">30 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/two-handed-maces.html">
-  <span class="tile-name">Two-Handed Maces</span>
+  <span class="tile-name"><span class="en">Two-Handed Maces</span><span class="ru">Двуручные булавы</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_knightlypolemace.png" alt=""></span>
-  <span class="tile-sub">31 items</span>
+  <span class="tile-sub">31 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/two-handed-spears.html">
-  <span class="tile-name">Spears</span>
+  <span class="tile-name"><span class="en">Spears</span><span class="ru">Копья</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_sponton.png" alt=""></span>
-  <span class="tile-sub">31 items</span>
+  <span class="tile-sub">31 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/two-handed-staves.html">
-  <span class="tile-name">Staves</span>
+  <span class="tile-name"><span class="en">Staves</span><span class="ru">Посохи</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_spellweaverstaff.png" alt=""></span>
-  <span class="tile-sub">38 items</span>
+  <span class="tile-sub">38 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:3">
-  <h2>Ranged</h2>
+  <h2><span class="en">Ranged</span><span class="ru">Дальний бой</span></h2>
   <div class="tiles"><a class="tile" href="gear/ranged-bows.html">
-  <span class="tile-name">Bows</span>
+  <span class="tile-name"><span class="en">Bows</span><span class="ru">Луки</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_aldorbow.png" alt=""></span>
-  <span class="tile-sub">22 items</span>
+  <span class="tile-sub">22 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/ranged-crossbows.html">
-  <span class="tile-name">Crossbows</span>
+  <span class="tile-name"><span class="en">Crossbows</span><span class="ru">Арбалеты</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_brynncrossbow.png" alt=""></span>
-  <span class="tile-sub">20 items</span>
+  <span class="tile-sub">20 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/ranged-slings.html">
-  <span class="tile-name">Slings</span>
+  <span class="tile-name"><span class="en">Slings</span><span class="ru">Пращи</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_sentiansling.png" alt=""></span>
-  <span class="tile-sub">19 items</span>
+  <span class="tile-sub">19 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:6">
-  <h2>Light Armor</h2>
+  <h2><span class="en">Light Armor</span><span class="ru">Лёгкая броня</span></h2>
   <div class="tiles"><a class="tile" href="gear/light-armor-head.html">
-  <span class="tile-name">Head</span>
+  <span class="tile-name"><span class="en">Head</span><span class="ru">Голова</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_mercenaryhat.png" alt=""></span>
-  <span class="tile-sub">41 items</span>
+  <span class="tile-sub">41 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/light-armor-chest.html">
-  <span class="tile-name">Chest</span>
+  <span class="tile-name"><span class="en">Chest</span><span class="ru">Торс</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_skaargarment.png" alt=""></span>
-  <span class="tile-sub">50 items</span>
+  <span class="tile-sub">50 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/light-armor-arms.html">
-  <span class="tile-name">Arms</span>
+  <span class="tile-name"><span class="en">Arms</span><span class="ru">Руки</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_duelistgloves.png" alt=""></span>
-  <span class="tile-sub">24 items</span>
+  <span class="tile-sub">24 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/light-armor-legs.html">
-  <span class="tile-name">Legs</span>
+  <span class="tile-name"><span class="en">Legs</span><span class="ru">Ноги</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_duelistboots.png" alt=""></span>
-  <span class="tile-sub">16 items</span>
+  <span class="tile-sub">16 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/light-armor-waist.html">
-  <span class="tile-name">Waist</span>
+  <span class="tile-name"><span class="en">Waist</span><span class="ru">Пояс</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_aristocratbelt.png" alt=""></span>
-  <span class="tile-sub">30 items</span>
+  <span class="tile-sub">30 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/light-armor-back.html">
-  <span class="tile-name">Back</span>
+  <span class="tile-name"><span class="en">Back</span><span class="ru">Спина</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_jibeancape.png" alt=""></span>
-  <span class="tile-sub">13 items</span>
+  <span class="tile-sub">13 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:4">
-  <h2>Medium Armor</h2>
+  <h2><span class="en">Medium Armor</span><span class="ru">Средняя броня</span></h2>
   <div class="tiles"><a class="tile" href="gear/medium-armor-head.html">
-  <span class="tile-name">Head</span>
+  <span class="tile-name"><span class="en">Head</span><span class="ru">Голова</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_sallet.png" alt=""></span>
-  <span class="tile-sub">21 items</span>
+  <span class="tile-sub">21 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/medium-armor-chest.html">
-  <span class="tile-name">Chest</span>
+  <span class="tile-name"><span class="en">Chest</span><span class="ru">Торс</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_captaincuirass.png" alt=""></span>
-  <span class="tile-sub">16 items</span>
+  <span class="tile-sub">16 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/medium-armor-arms.html">
-  <span class="tile-name">Arms</span>
+  <span class="tile-name"><span class="en">Arms</span><span class="ru">Руки</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_captaingloves.png" alt=""></span>
-  <span class="tile-sub">4 items</span>
+  <span class="tile-sub">4 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/medium-armor-legs.html">
-  <span class="tile-name">Legs</span>
+  <span class="tile-name"><span class="en">Legs</span><span class="ru">Ноги</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_captainboots.png" alt=""></span>
-  <span class="tile-sub">7 items</span>
+  <span class="tile-sub">7 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:4">
-  <h2>Heavy Armor</h2>
+  <h2><span class="en">Heavy Armor</span><span class="ru">Тяжёлая броня</span></h2>
   <div class="tiles"><a class="tile" href="gear/heavy-armor-head.html">
-  <span class="tile-name">Head</span>
+  <span class="tile-name"><span class="en">Head</span><span class="ru">Голова</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_visorealsentinet.png" alt=""></span>
-  <span class="tile-sub">17 items</span>
+  <span class="tile-sub">17 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/heavy-armor-chest.html">
-  <span class="tile-name">Chest</span>
+  <span class="tile-name"><span class="en">Chest</span><span class="ru">Торс</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_knightlybrigandine.png" alt=""></span>
-  <span class="tile-sub">14 items</span>
+  <span class="tile-sub">14 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/heavy-armor-arms.html">
-  <span class="tile-name">Arms</span>
+  <span class="tile-name"><span class="en">Arms</span><span class="ru">Руки</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_knightgauntlets.png" alt=""></span>
-  <span class="tile-sub">4 items</span>
+  <span class="tile-sub">4 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/heavy-armor-legs.html">
-  <span class="tile-name">Legs</span>
+  <span class="tile-name"><span class="en">Legs</span><span class="ru">Ноги</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_aldwynnsabatons.png" alt=""></span>
-  <span class="tile-sub">6 items</span>
+  <span class="tile-sub">6 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:3">
-  <h2>Shields</h2>
+  <h2><span class="en">Shields</span><span class="ru">Щиты</span></h2>
   <div class="tiles"><a class="tile" href="gear/shields-light.html">
-  <span class="tile-name">Light</span>
+  <span class="tile-name"><span class="en">Light</span><span class="ru">Лёгкие</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_reinforcedkalkan.png" alt=""></span>
-  <span class="tile-sub">16 items</span>
+  <span class="tile-sub">16 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/shields-medium.html">
-  <span class="tile-name">Medium</span>
+  <span class="tile-name"><span class="en">Medium</span><span class="ru">Средние</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_longshield.png" alt=""></span>
-  <span class="tile-sub">20 items</span>
+  <span class="tile-sub">20 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/shields-heavy.html">
-  <span class="tile-name">Heavy</span>
+  <span class="tile-name"><span class="en">Heavy</span><span class="ru">Тяжёлые</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_towershielda.png" alt=""></span>
-  <span class="tile-sub">9 items</span>
+  <span class="tile-sub">9 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section><section class="tile-group" style="--cols:2">
-  <h2>Jewelry</h2>
+  <h2><span class="en">Jewelry</span><span class="ru">Украшения</span></h2>
   <div class="tiles"><a class="tile" href="gear/jewelry-rings.html">
-  <span class="tile-name">Rings</span>
+  <span class="tile-name"><span class="en">Rings</span><span class="ru">Кольца</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_SilverEmeraldRing.png" alt=""></span>
-  <span class="tile-sub">30 items</span>
+  <span class="tile-sub">30 <span class="en">items</span><span class="ru">предметов</span></span>
 </a><a class="tile" href="gear/jewelry-amulets.html">
-  <span class="tile-name">Amulets</span>
+  <span class="tile-name"><span class="en">Amulets</span><span class="ru">Амулеты</span></span>
   <span class="tile-art"><img src="assets/icons/s_inv_silveremeraldamulet.png" alt=""></span>
-  <span class="tile-sub">31 items</span>
+  <span class="tile-sub">31 <span class="en">items</span><span class="ru">предметов</span></span>
 </a></div>
 </section></div></main>
+<script>
+(function () {
+  var box = document.getElementById("lang");
+  if (!box) return;
+  var mark = function () {
+    var lang = document.body.classList.contains("lang-ru") ? "ru" : "en";
+    for (var b of box.querySelectorAll("button")) {
+      b.classList.toggle("on", b.getAttribute("data-lang") === lang);
+    }
+  };
+  box.addEventListener("click", function (e) {
+    var button = e.target.closest("button[data-lang]");
+    if (!button) return;
+    var lang = button.getAttribute("data-lang");
+    document.body.classList.remove("lang-en", "lang-ru");
+    document.body.classList.add("lang-" + lang);
+    document.documentElement.lang = lang;
+    try { localStorage.setItem("rs-lang", lang); } catch (e) { /* приватное окно */ }
+    mark();
+  });
+  mark();
+})();
+</script>
 </body>
 </html>
