@@ -164,11 +164,15 @@ function granted() {
   const out = { '': { skill: 2 + (S.level - 1), attr: S.level - 1 } };
 
   // Дирвин: каждый третий навык Выживания добавляет очко в обычный пул.
-  // В перке стоит `!argument0.created_on_start` — выданные на старте навыки
-  // (Butchering и Make a Halt) в счёт не идут, только выученные за очки.
+  //
+  // Считается не «выученное за очки», а всё, что игра пропустила через
+  // счётчик global.open_survival_skill. В o_skill_ico_Other_18 он растёт под
+  // `if (!created_on_start)`, а этот флаг стоит ровно у одной Разделки.
+  // Поэтому Привал, выданный Дирвину перком, в счёт идёт наравне с
+  // выученными, а Разделка, которая есть у всех, — нет.
   if (S.hero === 'Dirwin') {
     const learnedHere = S.learned.filter(
-      (l) => l.branch === DIRWIN_BRANCH && l.pool === '');
+      (l) => l.branch === DIRWIN_BRANCH && !(nodeOf(l.obj) || {}).node?.onStart);
     const n = Math.floor(learnedHere.length / 3);
     out[''].skill += n;
     out[''].attr += n;
