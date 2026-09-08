@@ -53,6 +53,8 @@ const T = {
   noPoints:    ['No skill points left',   'Очков способностей не осталось'],
   requires:    ['Requires',               'Требуется'],
   levelWord:   ['level',                  'уровень'],
+  gainAp:      ['+1 AP',                  '+1 очко'],
+  granted:     ['granted',                'выдано'],
   oldLink:     ['This link is from an older version of the calculator — the build was restored only in part.',
                 'Ссылка от старой версии калькулятора — билд восстановлен не полностью.'],
 };
@@ -81,6 +83,10 @@ const ATTR_ALIAS = { Vitality: 'VIT', VIT: 'VIT' };
 // Особые пулы очков. Обычные очки — это пул с пустым ключом.
 // У Вельмира трофеи дают только очки атрибутов; переключение трофея меняет
 // доступный пул, а потраченное в каждом запоминается.
+//
+// `attr` — это потолок пула, а не выдача за нажатие: очки приходят по одному,
+// и кнопка нажимается столько раз, сколько их в пуле. Так и в игре — трофеи
+// сдаются по одному, а не все разом.
 const TROPHIES = {
   Velmir: [
     { key: 'troll', attr: 2,
@@ -101,6 +107,29 @@ const TROPHIES = {
       note: ['bonus AP from animal trophies', 'очки за трофеи зверей'] },
   ],
 };
+
+// Каменный круг — находка на глобальной карте, а не перк, поэтому он есть у
+// любого героя и приписан не к кому-то одному, а ко всем. Название взято из
+// игры (`RunicStones` в table_locations), а не придумано.
+const COMMON_POOLS = [
+  { key: 'stones', attr: 1,
+    label: ['Bonus point for a Boulder Circle', 'Очко за Каменный круг'],
+    note: ['AP from a Boulder Circle', 'очко за Каменный круг'] },
+];
+
+/** Все пулы героя: его трофеи, а следом общие для всех.
+ *
+ * Общие идут последними намеренно: ссылка на билд хранит пулы номерами в этом
+ * списке, и дописывание в конец не сдвигает уже разосланные ссылки.
+ */
+function pools(heroKey) {
+  return (TROPHIES[heroKey] || []).concat(COMMON_POOLS);
+}
+
+/** Сколько раз нажата кнопка пула. */
+function presses(key) {
+  return S.granted.filter((k) => k === key).length;
+}
 
 // Дирвин получает по очку способностей и атрибутов за каждый третий навык
 // Выживания. Отдельной галочки у них нет — работают как обычные.
@@ -189,9 +218,9 @@ function granted() {
     out[''].skill += Math.min(paid, MAHIR_MAX_BRANCHES);
   }
 
-  // Трофейный пул существует только после нажатия кнопки.
-  for (const t of TROPHIES[S.hero] || []) {
-    out[t.key] = { skill: 0, attr: S.granted.includes(t.key) ? t.attr : 0 };
+  // Пул наполняется нажатиями кнопки — по очку за нажатие, до своего потолка.
+  for (const p of pools(S.hero)) {
+    out[p.key] = { skill: 0, attr: Math.min(presses(p.key), p.attr) };
   }
   return out;
 }
@@ -353,7 +382,7 @@ function levelUp() {
 }
 
 function logLine(text, pool, id) {
-  const note = pool ? (TROPHIES[S.hero] || []).find((t) => t.key === pool) : null;
+  const note = pool ? pools(S.hero).find((p) => p.key === pool) : null;
   S.log.push({ id, level: S.level, text, note: note ? pick(note.note) : '' });
 }
 
@@ -401,20 +430,25 @@ function renderHero() {
       }, '+'));
   }));
 
+  // Кнопка пула: одно нажатие — одно очко. У пула на несколько очков рядом
+  // стоит счётчик, иначе не видно, сколько нажатий осталось.
   const box = document.getElementById('trophies');
-  box.replaceChildren(...(TROPHIES[S.hero] || []).map((t) => {
-    const given = S.granted.includes(t.key);
+  box.replaceChildren(...pools(S.hero).map((p) => {
+    const given = presses(p.key);
+    const full = given >= p.attr;
     return el('button', {
-      class: `trophy${given ? ' given' : ''}`,
-      disabled: given || null,
+      class: `trophy${full ? ' given' : ''}`,
+      disabled: full || null,
       onclick: () => {
         snapshot();
-        S.granted.push(t.key);
+        S.granted.push(p.key);
         render();
       },
     },
-      el('span', { class: 'trophy-label' }, pick(t.label)),
-      el('span', { class: 'trophy-gain' }, given ? 'granted' : `+${t.attr} AP`));
+      el('span', { class: 'trophy-label' }, pick(p.label)),
+      el('span', { class: 'trophy-gain' },
+         full ? t('granted')
+              : t('gainAp') + (p.attr > 1 ? ` (${given}/${p.attr})` : '')));
   }));
 
   const undoBtn = document.getElementById('undo');
@@ -664,7 +698,10 @@ function hideTip() { document.getElementById('tip').hidden = true; }
  * переставляли, поэтому в начале стоит версия. Ссылка, собранная до
  * перестановки, восстановится частично и скажет об этом.
  */
-const SHARE_VERSION = 1;
+// Версия 2: в `g` теперь по записи на каждое нажатие, то есть на каждое очко.
+// В первой версии пул записывался один раз и означал всю награду разом —
+// старые ссылки разбираются по своему правилу, чтобы не обесцениться.
+const SHARE_VERSION = 2;
 
 /** Плоский список всех узлов в порядке данных: индекс <-> объект. */
 const FLAT = [];
@@ -695,7 +732,7 @@ function fromBase64Url(text) {
 }
 
 function encodeBuild() {
-  const trophies = TROPHIES[S.hero] || [];
+  const trophies = pools(S.hero);
   const short = {
     v: SHARE_VERSION,
     h: S.hero,
@@ -717,15 +754,24 @@ function encodeBuild() {
 function decodeBuild(code) {
   let d;
   try { d = JSON.parse(fromBase64Url(code)); } catch (e) { return false; }
-  if (!d || d.v !== SHARE_VERSION) return false;
+  if (!d || (d.v !== SHARE_VERSION && d.v !== 1)) return false;
   if (!DATA.characters.some((c) => c.key === d.h)) return false;
 
-  const trophies = TROPHIES[d.h] || [];
+  const trophies = pools(d.h);
   const state = freshState(d.h);
   let complete = true;
 
   state.level = Math.min(Math.max(1, d.l | 0), LEVEL_CAP);
-  state.granted = (d.g || []).map((i) => (trophies[i] || {}).key).filter(Boolean);
+
+  // Запись пула — это нажатие. В первой версии ссылки одна запись означала
+  // весь пул сразу, поэтому там она разворачивается в столько нажатий,
+  // сколько в пуле очков.
+  state.granted = [];
+  for (const i of d.g || []) {
+    const p = trophies[i];
+    if (!p) { complete = false; continue; }
+    for (let n = d.v === 1 ? p.attr : 1; n > 0; n--) state.granted.push(p.key);
+  }
   state.open = (d.o || []).map((i) => (DATA.branches[i] || {}).key).filter(Boolean);
   if (state.open.length !== (d.o || []).length) complete = false;
 
@@ -759,7 +805,7 @@ function rebuildLog() {
     note: t('startSkill'),
   }));
 
-  const trophies = TROPHIES[S.hero] || [];
+  const trophies = pools(S.hero);
   const noteOf = (pool) => {
     const found = pool ? trophies.find((x) => x.key === pool) : null;
     return found ? pick(found.note) : '';
