@@ -1,4 +1,4 @@
-/* Rogue Shard Wiki — оформление.
+/* Rogue Shard Wiki - оформление.
    Тёмная схема под стать игре; цвета статов повторяют внутриигровые подсказки. */
 
 :root {
@@ -33,7 +33,7 @@ a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* Пиксель-арт: только ближайший сосед, иначе иконки мылятся при увеличении.
-   Логотипа и шапок это не касается — они не пиксельные и их уменьшают, а
+   Логотипа и шапок это не касается - они не пиксельные и их уменьшают, а
    ближайший сосед на уменьшении рвёт линии. */
 .tile-art img, .c-item img { image-rendering: pixelated; }
 
@@ -41,9 +41,9 @@ main { padding: 0 32px; max-width: 1680px; margin: 0 auto; }
 
 /* --- шапки ------------------------------------------------------------ */
 
-/* Шапка: логотип по центру, кнопка калькулятора слева от него. Три колонки,
-   а не флекс с отступами, — так логотип остаётся ровно по центру страницы
-   независимо от ширины кнопки. */
+/* Шапка: логотип по центру, кнопка калькулятора слева от него, патчноутов - 
+   справа. Три колонки, а не флекс с отступами, - так логотип остаётся ровно по
+   центру страницы независимо от ширины кнопок. */
 .site-logo {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -151,7 +151,7 @@ main { padding: 0 32px; max-width: 1680px; margin: 0 auto; }
 
 /* --- таблица предметов ------------------------------------------------ */
 
-/* Широкая таблица прокручивается внутри себя, страница — никогда. */
+/* Широкая таблица прокручивается внутри себя, страница - никогда. */
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -216,12 +216,12 @@ tbody tr.build:hover { background: transparent; }
 .gone-row .names .en { color: var(--gone); text-decoration: line-through; }
 
 /* Обе колонки свойств идут построчно парами, поэтому пустые места сохраняются:
-   строка слева и строка справа — это один и тот же стат. */
+   строка слева и строка справа - это один и тот же стат. */
 ul.props { list-style: none; margin: 0; padding: 0; font-size: 13px; max-width: 440px; }
 ul.props li { display: flex; gap: 10px; line-height: 21px; min-height: 21px; }
 ul.props li.empty { min-height: 21px; }
 
-/* Урон и защита отделяются от бонусов, прочность с ценой — от них же.
+/* Урон и защита отделяются от бонусов, прочность с ценой - от них же.
    Классы вешаются по номеру строки, поэтому в обеих колонках отступ встаёт на
    одну и ту же строку и построчное соответствие не ломается. */
 ul.props li.gap-below { margin-bottom: 10px; }
@@ -246,7 +246,7 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 
 /* По умолчанию страница показывает только то, что есть в моде: одна колонка
    свойств, без разниц в скобках, без зачёркнутого и без «новых» цветов. Всё
-   это лежит в разметке всегда — галочка лишь снимает класс simple. */
+   это лежит в разметке всегда - галочка лишь снимает класс simple. */
 
 .compare {
   display: inline-flex;
@@ -272,7 +272,7 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 /* Разница в скобках. */
 .simple ul.props .delta { display: none; }
 
-/* «Новое» и «стало лучше/хуже» — обычными цветами стата. */
+/* «Новое» и «стало лучше/хуже» - обычными цветами стата. */
 .simple ul.props .new-good { color: var(--good); }
 .simple ul.props .new-bad { color: var(--bad); }
 
@@ -296,7 +296,7 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
 .simple table { width: auto; }
 /* Ширины колонок остаются теми же, что и в режиме сравнения: сжимается только
    таблица целиком, а внутри неё отступы и колонка предмета не меняются.
-   Колонка шире списка статов (440px) — иначе значения упираются в правую
+   Колонка шире списка статов (440px) - иначе значения упираются в правую
    границу, тогда как в режиме сравнения справа от них остаётся запас. */
 .simple .c-props.mod { width: auto; min-width: 500px; }
 
@@ -333,20 +333,72 @@ ul.props li.gone .label, ul.props li.gone .value { text-decoration: line-through
   color: var(--dim);
 }
 .calc-button:hover .calc-button-title { color: var(--link); }
+.notes-button { justify-self: start; }
 
 @media (max-width: 800px) {
   .site-logo { grid-template-columns: 1fr; }
   .calc-button { justify-self: center; }
 }
 
+/* --- патчноуты ----------------------------------------------------------
+   Слева список версий (на широком экране держится на месте), справа сами
+   версии. Цвета бонусов и штрафов - те же, что у статов предметов. */
+.cl-head { padding: 0 32px; max-width: 1180px; margin: 0 auto; }
+.cl-main { max-width: 1180px; }
+.cl-lang { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; align-items: start; }
+body.lang-en .cl-lang.ru, body.lang-ru .cl-lang.en { display: none; }
+.cl-toc {
+  position: sticky; top: 16px;
+  max-height: calc(100vh - 32px); overflow-y: auto;
+  padding: 14px 16px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel);
+}
+.cl-toc h2 { margin: 0 0 8px; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--dim); }
+.cl-toc ol { list-style: none; margin: 0; padding: 0; }
+.cl-toc li { padding: 3px 0; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.cl-toc li span { display: block; color: var(--dim); font-size: 12px; }
+.cl-body { max-width: 820px; }
+.cl-version {
+  margin: 0 0 22px; padding: 18px 24px 8px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--panel);
+  scroll-margin-top: 16px;
+}
+.cl-version h2 { margin: 0 0 6px; font-size: 22px; font-variant-numeric: tabular-nums; }
+.cl-version h2 a { color: var(--text); }
+.cl-title { margin-left: 10px; color: var(--dim); font-size: 16px; font-weight: 400; }
+.cl-sec h3 {
+  margin: 16px 0 6px; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--link);
+}
+.cl-sec h4 { margin: 12px 0 4px; font-size: 15px; color: var(--text); }
+.cl-sec ul { margin: 0 0 6px; padding-left: 20px; }
+.cl-sec ul ul { margin: 2px 0 4px; }
+.cl-sec li { margin: 3px 0; }
+.cl-sec li::marker { color: var(--dim); }
+.cl-sec strong { color: var(--text); }
+.cl-sec .good { color: var(--good); }
+.cl-sec .bad { color: var(--bad); }
+.cl-sec code {
+  padding: 1px 5px; border-radius: 3px; background: var(--panel-3);
+  font: 13px/1.4 Consolas, "Cascadia Mono", monospace; white-space: nowrap;
+}
+.cl-sec li.notice { list-style: none; margin-left: -20px; padding: 8px 12px; border-left: 3px solid var(--bad); background: var(--panel-2); }
+.cl-fixes h3 { color: var(--dim); }
+
+@media (max-width: 900px) {
+  .cl-lang { grid-template-columns: minmax(0, 1fr); }
+  .cl-toc { position: static; max-height: none; }
+  .cl-toc ol { columns: 3 110px; }
+  .cl-head, main.cl-main { padding: 0 16px; }
+  .cl-sec code { white-space: normal; }
+}
+
 /* --- язык ----------------------------------------------------------------
    Двуязычные надписи лежат в разметке парой, показывается одна. Страницы
-   статические, поэтому переключение — это класс на body, а не пересборка. */
+   статические, поэтому переключение - это класс на body, а не пересборка. */
 
 body.lang-en .ru { display: none; }
 body.lang-ru .en { display: none; }
 
-/* У предмета показывается одно название — то, на каком языке читают. */
+/* У предмета показывается одно название - то, на каком языке читают. */
 body.lang-ru .names .ru { font-size: 15px; font-weight: 600; color: var(--text); }
 body.lang-ru .gone-row .names .ru { color: var(--gone); text-decoration: line-through; }
 
@@ -369,3 +421,53 @@ body.lang-ru .gone-row .names .ru { color: var(--gone); text-decoration: line-th
   border-color: var(--link);
   background: var(--panel-3);
 }
+
+/* --- карточки умений в патчноутах --------------------------------------
+   Как строка умения на официальной вики: иконка и название, блок статов,
+   описание. Цвета названий классов, текста и значений - оттуда же. Старое
+   зачёркнуто, новое подсвечено; абзац, переписанный целиком, стоит под старым. */
+.sk-cards { display: grid; gap: 8px; margin: 8px 0 10px; }
+.sk-card {
+  display: grid; grid-template-columns: 116px 190px minmax(0, 1fr);
+  border: 1px solid #3a3456; background: #221f35; color: #9d9a9a;
+  font-size: 13px; line-height: 1.45;
+}
+.sk-card > div { padding: 10px 12px; }
+.sk-card > div + div { border-left: 1px solid #3a3456; }
+.sk-head { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
+.sk-head img { width: 54px; height: 54px; object-fit: contain; image-rendering: pixelated; }
+.sk-noicon { width: 54px; height: 54px; border: 1px dashed #3a3456; }
+.sk-name { font-size: 13px; }
+.sk-active { color: rgb(14, 215, 142); }
+.sk-passive { color: rgb(163, 183, 25); }
+.sk-badge { font-size: 11px; letter-spacing: .5px; color: var(--link); }
+.sk-stats { color: #fff; }
+.sk-kind { text-align: center; margin-bottom: 4px; }
+.sk-row { display: flex; justify-content: space-between; gap: 8px; }
+.sk-row span:last-child { text-align: right; }
+.sk-req { margin-top: 4px; color: rgb(113, 114, 94); }
+.sk-desc { text-align: center; }
+.sk-desc p { margin: 0 0 10px; }
+.sk-desc p:last-child { margin-bottom: 0; }
+.sk-card .v-g { color: rgb(120, 209, 153); }
+.sk-card .v-r { color: rgb(208, 67, 90); }
+.sk-card .v-w { color: #fff; }
+.sk-card .v-g[title], .sk-card .v-r[title], .sk-card .v-w[title] { cursor: help; }
+.sk-card s.was, .sk-card .para-was s { color: #6a6f8c; text-decoration-color: #8b91b4; }
+.sk-card s.was .v-g, .sk-card s.was .v-r, .sk-card s.was .v-w,
+.sk-card .para-was .v-g, .sk-card .para-was .v-r, .sk-card .para-was .v-w { color: #6a6f8c; }
+.sk-card .now { background: rgba(127, 169, 255, .14); border-radius: 2px; padding: 0 1px; }
+.sk-card .para-now { background: rgba(127, 169, 255, .08); border-radius: 3px; padding: 2px 4px; }
+@media (max-width: 900px) {
+  .sk-card { grid-template-columns: 1fr; }
+  .sk-card > div + div { border-left: 0; border-top: 1px solid #3a3456; }
+  .sk-head { flex-direction: row; justify-content: flex-start; }
+}
+
+/* Картинка ветки: та же раскладка, что у калькулятора, все линии горят. */
+.br-pic { margin: 8px auto 10px; display: block; width: fit-content; background: #1a1d33; border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+.br-body { position: relative; }
+.br-line, .br-node { position: absolute; image-rendering: pixelated; }
+.br-pic figcaption { margin-top: 6px; text-align: center; font-size: 12px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+.br-mask { background: rgb(193, 154, 255); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.br-pic { max-width: 100%; overflow-x: auto; }
